@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Collection, BillWithMembers, Member, PaymentMethod } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils/currency";
 import { getAvatarColor, getInitial } from "@/lib/utils/avatars";
-import CollectionBillCard from "@/components/pay/CollectionBillCard";
+import ConsolidatedPayeeFlow from "@/components/pay/ConsolidatedPayeeFlow";
 
 interface CollectionPayeeViewProps {
   collection: Collection;
@@ -38,13 +38,22 @@ export default function CollectionPayeeView({
   paymentMethods,
 }: CollectionPayeeViewProps) {
   const [selectedName, setSelectedName] = useState<string | null>(null);
-  const [expandedBillId, setExpandedBillId] = useState<string | null>(null);
+  // Track member IDs that have been claimed in this session
   const [claimedIds, setClaimedIds] = useState<Set<string>>(new Set());
 
   const uniqueNames = extractUniqueNames(bills);
 
-  function handleClaimed(memberId: string) {
-    setClaimedIds((prev) => new Set(prev).add(memberId));
+  function handleAllClaimed(name: string) {
+    // Mark all members for this name across all bills as claimed
+    const ids = bills.flatMap((b) => {
+      const m = findMemberByName(name, b);
+      return m ? [m.id] : [];
+    });
+    setClaimedIds((prev: Set<string>) => {
+      const next = new Set(prev);
+      ids.forEach((id) => next.add(id));
+      return next;
+    });
   }
 
   // Step 1: name selection
@@ -99,18 +108,22 @@ export default function CollectionPayeeView({
     );
   }
 
-  // Step 2: personalized dashboard
+  // Step 2: consolidated payment flow
   const myBills = bills.filter((b) => findMemberByName(selectedName, b) !== null);
   const otherBills = bills.filter((b) => findMemberByName(selectedName, b) === null);
 
-  const paidCount = myBills.filter((b) => {
+  const unpaidBills = myBills.filter((b) => {
+    const m = findMemberByName(selectedName, b)!;
+    return !m.is_paid && !m.claimed_paid && !claimedIds.has(m.id);
+  });
+  const doneBills = myBills.filter((b) => {
     const m = findMemberByName(selectedName, b)!;
     return m.is_paid || m.claimed_paid || claimedIds.has(m.id);
-  }).length;
+  });
 
-  const remainingAmount = myBills.reduce((sum, b) => {
+  const paidCount = doneBills.length;
+  const remainingAmount = unpaidBills.reduce((sum, b) => {
     const m = findMemberByName(selectedName, b)!;
-    if (m.is_paid || m.claimed_paid || claimedIds.has(m.id)) return sum;
     return sum + m.share_amount;
   }, 0);
 
@@ -123,7 +136,7 @@ export default function CollectionPayeeView({
       <div className="pay-inner">
         <button
           className="pay-back-btn"
-          onClick={() => { setSelectedName(null); setExpandedBillId(null); }}
+          onClick={() => setSelectedName(null)}
         >
           ← Not {selectedName}?
         </button>
@@ -147,29 +160,20 @@ export default function CollectionPayeeView({
           </div>
         )}
 
-        {/* Bills the payee is in */}
         {myBills.length === 0 ? (
           <div className="empty-state">
             <p className="empty-state-title">You&apos;re not in any of these bills</p>
             <p className="empty-state-sub">Contact Brian if you think this is a mistake.</p>
           </div>
         ) : (
-          <div className="collection-bills-list">
-            {myBills.map((bill) => {
-              const member = findMemberByName(selectedName, bill)!;
-              return (
-                <CollectionBillCard
-                  key={bill.id}
-                  bill={bill}
-                  member={member}
-                  paymentMethods={paymentMethods}
-                  isExpanded={expandedBillId === bill.id}
-                  onToggle={() => setExpandedBillId(expandedBillId === bill.id ? null : bill.id)}
-                  onClaimed={handleClaimed}
-                />
-              );
-            })}
-          </div>
+          <ConsolidatedPayeeFlow
+            unpaidBills={unpaidBills}
+            doneBills={doneBills}
+            memberName={selectedName}
+            paymentMethods={paymentMethods}
+            collectionId={collection.id}
+            onAllClaimed={() => handleAllClaimed(selectedName)}
+          />
         )}
 
         {/* Bills the payee is NOT in */}
