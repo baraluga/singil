@@ -36,6 +36,18 @@ export interface MemberInput {
 
 export type SplitMode = "equal" | "manual" | "honesty";
 
+export interface Collection {
+  id: string;
+  user_id: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CollectionWithBills extends Collection {
+  bills: BillWithMembers[];
+}
+
 export interface PaymentMethod {
   id: string;
   user_id: string;
