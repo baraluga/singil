@@ -1546,6 +1546,7 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 16px;
+  margin-bottom: 10px;
   box-shadow: var(--shadow);
   color: var(--ink);
 }
@@ -1566,7 +1567,7 @@ body {
 }
 .collection-card-amount {
   font-family: var(--font-serif);
-  font-size: 18px;
+  font-size: 20px;
   color: var(--ink);
 }
 .collection-card-progress {

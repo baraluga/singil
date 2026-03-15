@@ -35,9 +35,9 @@ export default function CollectionCard({ collection }: CollectionCardProps) {
       </div>
       {totalMembers > 0 && (
         <div className="collection-card-progress">
-          <div className="progress-bar">
+          <div className="progress-bar-wrap">
             <div
-              className="progress-fill"
+              className="progress-bar-fill"
               style={{ width: `${(paidCount / totalMembers) * 100}%` }}
             />
           </div>
