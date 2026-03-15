@@ -1,0 +1,42 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase-server";
+
+export async function confirmPaid(memberId: string, billId: string) {
+  const supabase = await createClient();
+  await supabase
+    .from("members")
+    .update({ is_paid: true, claimed_paid: false })
+    .eq("id", memberId);
+  revalidatePath(`/bills/${billId}`);
+}
+
+export async function dismissClaim(memberId: string, billId: string) {
+  const supabase = await createClient();
+  await supabase
+    .from("members")
+    .update({ claimed_paid: false })
+    .eq("id", memberId);
+  revalidatePath(`/bills/${billId}`);
+}
+
+export async function markPaid(memberId: string, billId: string) {
+  const supabase = await createClient();
+  await supabase
+    .from("members")
+    .update({ is_paid: true })
+    .eq("id", memberId);
+  revalidatePath(`/bills/${billId}`);
+}
+
+export async function settleBill(billId: string) {
+  const supabase = await createClient();
+  await supabase
+    .from("bills")
+    .update({ is_settled: true })
+    .eq("id", billId);
+  revalidatePath("/bills");
+  redirect("/bills");
+}
