@@ -7,7 +7,6 @@ interface MemberRowProps {
   index: number;
   splitMode: SplitMode;
   onNameChange: (tempId: string, name: string) => void;
-  onAmountChange: (tempId: string, amount: number) => void;
   onRemove: (tempId: string) => void;
   canRemove: boolean;
 }
@@ -17,7 +16,6 @@ export default function MemberRow({
   index,
   splitMode,
   onNameChange,
-  onAmountChange,
   onRemove,
   canRemove,
 }: MemberRowProps) {
@@ -38,16 +36,8 @@ export default function MemberRow({
         placeholder={`Member ${index + 1}`}
         className="member-name-input"
       />
-      {splitMode === "honesty" ? null : splitMode === "equal" ? (
+      {splitMode === "equal" && (
         <span className="member-amount">{formatCurrency(member.amount)}</span>
-      ) : (
-        <input
-          type="number"
-          value={member.amount || ""}
-          onChange={(e) => onAmountChange(member.tempId, parseFloat(e.target.value) || 0)}
-          placeholder="0"
-          className="member-amount-input"
-        />
       )}
       {canRemove && (
         <button

@@ -8,18 +8,14 @@ interface SplitToggleProps {
 export default function SplitToggle({ value, onChange }: SplitToggleProps) {
   return (
     <div className="split-toggle">
-      {(["honesty", "equal", "manual"] as SplitMode[]).map((mode) => (
+      {(["honesty", "equal"] as SplitMode[]).map((mode) => (
         <button
           key={mode}
           type="button"
           onClick={() => onChange(mode)}
           className={`split-opt${value === mode ? " active" : ""}`}
         >
-          {mode === "equal"
-            ? "Equal split"
-            : mode === "manual"
-              ? "Manual"
-              : "Honesty"}
+          {mode === "equal" ? "Equal split" : "Honesty"}
         </button>
       ))}
     </div>

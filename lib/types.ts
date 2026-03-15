@@ -34,7 +34,7 @@ export interface MemberInput {
   amount: number;
 }
 
-export type SplitMode = "equal" | "manual" | "honesty";
+export type SplitMode = "equal" | "honesty";
 
 export interface Collection {
   id: string;

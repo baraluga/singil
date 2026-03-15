@@ -292,7 +292,7 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
               )}
             </>
           ) : (
-            /* Equal / manual mode, or post-claim honesty */
+            /* Equal mode, or post-claim honesty */
             <>
               <div className="share-card">
                 <p className="share-card-label">Your share</p>

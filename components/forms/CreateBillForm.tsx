@@ -43,10 +43,6 @@ export default function CreateBillForm() {
     setMembers((prev) => prev.map((m) => (m.tempId === tempId ? { ...m, name: newName } : m)));
   }
 
-  function handleAmountChange(tempId: string, amount: number) {
-    setMembers((prev) => prev.map((m) => (m.tempId === tempId ? { ...m, amount } : m)));
-  }
-
   function handleRemove(tempId: string) {
     setMembers((prev) => prev.filter((m) => m.tempId !== tempId));
   }
@@ -60,7 +56,7 @@ export default function CreateBillForm() {
     if (mode === "equal") {
       const shares = calculateEqualSplit(totalAmount, members.length);
       setMembers((prev) => prev.map((m, i) => ({ ...m, amount: shares[i] ?? 0 })));
-    } else if (mode === "honesty") {
+    } else {
       setMembers((prev) => prev.map((m) => ({ ...m, amount: 0 })));
     }
   }
@@ -75,9 +71,6 @@ export default function CreateBillForm() {
     if (totalAmount <= 0) return setError("Total amount must be greater than 0");
     const validMembers = members.filter((m) => m.name.trim());
     if (validMembers.length === 0) return setError("At least one member with a name is required");
-    const isBalanced = Math.abs(totalAssigned - totalAmount) < 0.01;
-    if (splitMode === "manual" && !isBalanced) return setError("Member amounts must add up to the total");
-
     setIsSubmitting(true);
 
     let receiptUrl: string | null = null;
@@ -185,7 +178,6 @@ export default function CreateBillForm() {
             index={i}
             splitMode={splitMode}
             onNameChange={handleNameChange}
-            onAmountChange={handleAmountChange}
             onRemove={handleRemove}
             canRemove={members.length > 1}
           />
