@@ -1,16 +1,16 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Bill, Member, PaymentMethod } from "@/lib/types";
+import { BillWithMembers, Member, PaymentMethod } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils/currency";
-import { getShareBreakdown } from "@/lib/utils/split";
+import { calcScPerPerson } from "@/lib/utils/split";
 import Modal from "@/components/ui/Modal";
 import Toast from "@/components/ui/Toast";
 import PaymentMethodCard from "@/components/pay/PaymentMethodCard";
 import QrModal from "@/components/pay/QrModal";
 
 interface CollectionBillCardProps {
-  bill: Bill;
+  bill: BillWithMembers;
   member: Member;
   paymentMethods: PaymentMethod[];
   isExpanded: boolean;
@@ -41,8 +41,8 @@ export default function CollectionBillCard({
 
   const isHonesty = bill.split_mode === "honesty";
   const honestyAmount = honestyItems.reduce((s, v) => s + v, 0);
-  const honestyScAmount = honestyAmount * (bill.service_charge_pct / 100);
-  const honestyTotal = honestyAmount + honestyScAmount;
+  const scPerPerson = calcScPerPerson(bill.service_charge_amount, bill.members.length);
+  const honestyTotal = honestyAmount + scPerPerson;
 
   const isPaid = member.is_paid;
   const hasClaimed = claimed || member.claimed_paid;
@@ -213,10 +213,10 @@ export default function CollectionBillCard({
                             <span>Subtotal</span>
                             <span>{formatCurrency(honestyAmount)}</span>
                           </div>
-                          {bill.service_charge_pct > 0 && (
+                          {scPerPerson > 0 && (
                             <div className="honesty-summary-row sc">
-                              <span>SC ({bill.service_charge_pct}%)</span>
-                              <span>+{formatCurrency(honestyScAmount)}</span>
+                              <span>SC (your share)</span>
+                              <span>+{formatCurrency(scPerPerson)}</span>
                             </div>
                           )}
                           <div className="honesty-summary-row total">
@@ -252,10 +252,10 @@ export default function CollectionBillCard({
                           <span>Subtotal</span>
                           <span>{formatCurrency(honestyAmount)}</span>
                         </div>
-                        {bill.service_charge_pct > 0 && (
+                        {scPerPerson > 0 && (
                           <div className="honesty-summary-row sc">
-                            <span>SC ({bill.service_charge_pct}%)</span>
-                            <span>+{formatCurrency(honestyScAmount)}</span>
+                            <span>SC (your share)</span>
+                            <span>+{formatCurrency(scPerPerson)}</span>
                           </div>
                         )}
                       </div>
@@ -271,14 +271,11 @@ export default function CollectionBillCard({
                   <div className="share-card">
                     <p className="share-card-label">Your share</p>
                     <p className="share-amount">{formatCurrency(member.share_amount)}</p>
-                    {(() => {
-                      const { food, sc } = getShareBreakdown(member.share_amount, bill.service_charge_pct);
-                      return (
-                        <p className="share-breakdown">
-                          {formatCurrency(food)} food + {formatCurrency(sc)} SC ({bill.service_charge_pct}%)
-                        </p>
-                      );
-                    })()}
+                    {scPerPerson > 0 && (
+                      <p className="share-breakdown">
+                        {formatCurrency(member.share_amount - scPerPerson)} food + {formatCurrency(scPerPerson)} SC
+                      </p>
+                    )}
                     <button className="share-copy-btn" onClick={handleCopyAmount}>
                       Copy amount
                     </button>

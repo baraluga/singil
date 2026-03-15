@@ -7,6 +7,8 @@ import BillCard from "@/components/bills/BillCard";
 import CollectionShareButtons from "@/components/collections/CollectionShareButtons";
 import DeleteCollectionButton from "@/components/collections/DeleteCollectionButton";
 
+export const dynamic = "force-dynamic";
+
 export default async function CollectionDetailPage({
   params,
 }: {

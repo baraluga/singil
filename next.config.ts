@@ -2,7 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   experimental: {
-    viewTransition: true,
+    serverActions: {
+      bodySizeLimit: "5mb",
+    },
   },
 };
 

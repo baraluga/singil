@@ -2,11 +2,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { formatCurrency } from "@/lib/utils/currency";
+import { calcScPerPerson } from "@/lib/utils/split";
 import MemberDetailRow from "@/components/bills/MemberDetailRow";
 import ShareButtons from "@/components/bills/ShareButtons";
 import ReceiptThumbnail from "@/components/bills/ReceiptThumbnail";
 import SettleButton from "@/components/bills/SettleButton";
 import EditableBillName from "@/components/bills/EditableBillName";
+
+export const dynamic = "force-dynamic";
 
 export default async function BillDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -51,7 +54,7 @@ export default async function BillDetailPage({ params }: { params: Promise<{ id:
             <EditableBillName billId={bill.id} name={bill.name} />
           )}
           <p className="bill-hero-meta">
-            {date} · {memberList.length} {memberList.length === 1 ? "member" : "members"} · SC {bill.service_charge_pct}%
+            {date} · {memberList.length} {memberList.length === 1 ? "member" : "members"} · SC {bill.service_charge_amount > 0 ? formatCurrency(bill.service_charge_amount) : "none"}
           </p>
           <p className="bill-hero-total">
             {formatCurrency(bill.total_amount)}{" "}
@@ -75,7 +78,7 @@ export default async function BillDetailPage({ params }: { params: Promise<{ id:
           <MemberDetailRow
             key={member.id}
             member={member}
-            scPct={bill.service_charge_pct}
+            scPerPerson={calcScPerPerson(bill.service_charge_amount, memberList.length)}
             index={i}
             billId={bill.id}
           />

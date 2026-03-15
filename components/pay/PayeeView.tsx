@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Bill, Member, PaymentMethod } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils/currency";
-import { getShareBreakdown } from "@/lib/utils/split";
+import { calcScPerPerson } from "@/lib/utils/split";
 import { getAvatarColor, getInitial } from "@/lib/utils/avatars";
 import Modal from "@/components/ui/Modal";
 import Toast from "@/components/ui/Toast";
@@ -54,8 +54,8 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
 
   const isHonesty = bill.split_mode === "honesty";
   const honestyAmount = honestyItems.reduce((s, v) => s + v, 0);
-  const honestyScAmount = honestyAmount * (bill.service_charge_pct / 100);
-  const honestyTotal = honestyAmount + honestyScAmount;
+  const scPerPerson = calcScPerPerson(bill.service_charge_amount, members.length);
+  const honestyTotal = honestyAmount + scPerPerson;
 
   const selectedMember = members.find((m) => m.id === selectedMemberId) ?? null;
 
@@ -253,10 +253,10 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
                         <span>Subtotal</span>
                         <span>{formatCurrency(honestyAmount)}</span>
                       </div>
-                      {bill.service_charge_pct > 0 && (
+                      {scPerPerson > 0 && (
                         <div className="honesty-summary-row sc">
-                          <span>SC ({bill.service_charge_pct}%)</span>
-                          <span>+{formatCurrency(honestyScAmount)}</span>
+                          <span>SC (your share)</span>
+                          <span>+{formatCurrency(scPerPerson)}</span>
                         </div>
                       )}
                       <div className="honesty-summary-row total">
@@ -292,10 +292,10 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
                       <span>Subtotal</span>
                       <span>{formatCurrency(honestyAmount)}</span>
                     </div>
-                    {bill.service_charge_pct > 0 && (
+                    {scPerPerson > 0 && (
                       <div className="honesty-summary-row sc">
-                        <span>SC ({bill.service_charge_pct}%)</span>
-                        <span>+{formatCurrency(honestyScAmount)}</span>
+                        <span>SC (your share)</span>
+                        <span>+{formatCurrency(scPerPerson)}</span>
                       </div>
                     )}
                   </div>
@@ -311,12 +311,12 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
               <div className="share-card">
                 <p className="share-card-label">Your share</p>
                 <p className="share-amount">{formatCurrency(isHonesty ? honestyTotal : selectedMember.share_amount)}</p>
-                {(() => {
+                {scPerPerson > 0 && (() => {
                   const amount = isHonesty ? honestyTotal : selectedMember.share_amount;
-                  const { food, sc } = getShareBreakdown(amount, bill.service_charge_pct);
+                  const food = amount - scPerPerson;
                   return (
                     <p className="share-breakdown">
-                      {formatCurrency(food)} food + {formatCurrency(sc)} SC ({bill.service_charge_pct}%)
+                      {formatCurrency(food)} food + {formatCurrency(scPerPerson)} SC
                     </p>
                   );
                 })()}

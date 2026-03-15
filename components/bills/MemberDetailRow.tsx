@@ -3,7 +3,6 @@
 import { useRef, useState, useTransition } from "react";
 import { Member } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils/currency";
-import { getShareBreakdown } from "@/lib/utils/split";
 import { getAvatarColor, getInitial } from "@/lib/utils/avatars";
 import { confirmPaid, dismissClaim, markPaid, updateMemberName } from "@/lib/actions/members";
 import Modal from "@/components/ui/Modal";
@@ -11,15 +10,16 @@ import Toast from "@/components/ui/Toast";
 
 interface MemberDetailRowProps {
   member: Member;
-  scPct: number;
+  scPerPerson: number;
   index: number;
   billId: string;
 }
 
-export default function MemberDetailRow({ member, scPct, index, billId }: MemberDetailRowProps) {
+export default function MemberDetailRow({ member, scPerPerson, index, billId }: MemberDetailRowProps) {
   const colors = getAvatarColor(index);
   const hasAmount = member.share_amount > 0;
-  const { food, sc } = getShareBreakdown(member.share_amount, scPct);
+  const sc = hasAmount ? scPerPerson : 0;
+  const food = member.share_amount - sc;
   const [proofOpen, setProofOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();

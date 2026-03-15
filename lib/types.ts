@@ -4,7 +4,7 @@ export interface Bill {
   name: string;
   date: string;
   total_amount: number;
-  service_charge_pct: number;
+  service_charge_amount: number;
   split_mode: SplitMode;
   receipt_url: string | null;
   is_settled: boolean;
