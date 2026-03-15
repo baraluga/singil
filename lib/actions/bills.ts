@@ -70,5 +70,6 @@ export async function createBill(data: CreateBillInput): Promise<{ id: string } 
 
   if (membersError) return { error: membersError.message };
 
+  revalidatePath("/bills");
   return { id: bill.id };
 }

@@ -8,6 +8,8 @@ import ReceiptThumbnail from "@/components/bills/ReceiptThumbnail";
 import SettleButton from "@/components/bills/SettleButton";
 import EditableBillName from "@/components/bills/EditableBillName";
 
+export const dynamic = "force-dynamic";
+
 export default async function BillDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 

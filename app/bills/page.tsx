@@ -4,6 +4,8 @@ import { BillWithMembers, CollectionWithBills } from "@/lib/types";
 import LogoutButton from "@/components/LogoutButton";
 import BillsTabs from "@/components/bills/BillsTabs";
 
+export const dynamic = "force-dynamic";
+
 export default async function BillsPage() {
   const supabase = supabaseAdmin;
 
