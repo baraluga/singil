@@ -74,7 +74,8 @@ export default function CollectionBillCard({
 
   async function handleCopyAmount() {
     const amount = isHonesty ? honestyTotal : member.share_amount;
-    await navigator.clipboard.writeText(formatCurrency(amount));
+    const rounded = Math.round(amount * 100) / 100;
+    await navigator.clipboard.writeText(String(rounded));
     setToastMsg("Amount copied!");
   }
 
