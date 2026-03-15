@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase-server";
+import { notFound } from "next/navigation";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 import { formatCurrency } from "@/lib/utils/currency";
 import MemberDetailRow from "@/components/bills/MemberDetailRow";
 import ShareButtons from "@/components/bills/ShareButtons";
@@ -9,19 +9,16 @@ import SettleButton from "@/components/bills/SettleButton";
 
 export default async function BillDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/");
 
-  const { data: bill } = await supabase
+  const { data: bill } = await supabaseAdmin
     .from("bills")
     .select("*")
     .eq("id", id)
     .single();
 
-  if (!bill || bill.user_id !== user.id) notFound();
+  if (!bill) notFound();
 
-  const { data: members } = await supabase
+  const { data: members } = await supabaseAdmin
     .from("members")
     .select("*")
     .eq("bill_id", id)

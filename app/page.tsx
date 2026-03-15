@@ -1,12 +1,12 @@
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase-server";
+import { verifySessionToken, COOKIE_NAME } from "@/lib/session";
 import LoginForm from "@/components/forms/LoginForm";
 
 export default async function Home() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (user) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(COOKIE_NAME)?.value;
+  if (token && await verifySessionToken(token)) {
     redirect("/bills");
   }
 

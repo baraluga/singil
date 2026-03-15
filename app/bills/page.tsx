@@ -1,20 +1,15 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase-server";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 import { BillWithMembers } from "@/lib/types";
 import BillCard from "@/components/bills/BillCard";
 import LogoutButton from "@/components/LogoutButton";
 
 export default async function BillsPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) redirect("/");
+  const supabase = supabaseAdmin;
 
   const { data: bills } = await supabase
     .from("bills")
     .select("*")
-    .eq("user_id", user.id)
     .order("date", { ascending: false });
 
   const billIds = (bills ?? []).map((b) => b.id);

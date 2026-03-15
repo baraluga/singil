@@ -2,11 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase-server";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 
 export async function confirmPaid(memberId: string, billId: string) {
-  const supabase = await createClient();
-  await supabase
+  await supabaseAdmin
     .from("members")
     .update({ is_paid: true, claimed_paid: false })
     .eq("id", memberId);
@@ -14,8 +13,7 @@ export async function confirmPaid(memberId: string, billId: string) {
 }
 
 export async function dismissClaim(memberId: string, billId: string) {
-  const supabase = await createClient();
-  await supabase
+  await supabaseAdmin
     .from("members")
     .update({ claimed_paid: false })
     .eq("id", memberId);
@@ -23,8 +21,7 @@ export async function dismissClaim(memberId: string, billId: string) {
 }
 
 export async function markPaid(memberId: string, billId: string) {
-  const supabase = await createClient();
-  await supabase
+  await supabaseAdmin
     .from("members")
     .update({ is_paid: true })
     .eq("id", memberId);
@@ -32,8 +29,7 @@ export async function markPaid(memberId: string, billId: string) {
 }
 
 export async function settleBill(billId: string) {
-  const supabase = await createClient();
-  await supabase
+  await supabaseAdmin
     .from("bills")
     .update({ is_settled: true })
     .eq("id", billId);

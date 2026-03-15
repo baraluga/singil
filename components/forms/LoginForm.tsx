@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
-  const [email, setEmail] = useState("");
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const router = useRouter();
+  const [username, setUsername] = useState("admin");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -14,62 +15,56 @@ export default function LoginForm() {
     setIsLoading(true);
     setError(null);
 
-    const supabase = createClient();
-    const origin = window.location.origin;
-
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: `${origin}/auth/callback` },
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
     });
 
-    if (error) {
-      setError(error.message);
+    if (!res.ok) {
+      setError("Wrong username or password.");
       setIsLoading(false);
       return;
     }
 
-    setIsSubmitted(true);
-    setIsLoading(false);
-  }
-
-  if (isSubmitted) {
-    return (
-      <div className="text-center">
-        <div className="text-4xl mb-4">📬</div>
-        <h2 className="font-serif text-2xl text-ink mb-2">Check your email</h2>
-        <p className="text-ink-muted text-sm">
-          We sent a magic link to <strong>{email}</strong>.
-          <br />
-          Tap it to sign in.
-        </p>
-      </div>
-    );
+    router.push("/bills");
   }
 
   return (
     <form onSubmit={handleSubmit} className="w-full">
       <div className="mb-4">
         <label className="block text-[11px] font-semibold tracking-[0.08em] uppercase text-ink-muted mb-1.5">
-          Email
+          Username
         </label>
         <input
-          type="email"
+          type="text"
           required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
-          className="w-full bg-surface border border-border rounded-[10px] px-3.5 py-3 text-sm text-ink placeholder-[#BEB5A8] outline-none focus:border-accent"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          className="w-full bg-surface border border-border rounded-[10px] px-3.5 py-3 text-sm text-ink outline-none focus:border-accent"
         />
       </div>
-      {error && (
-        <p className="text-[#DC2626] text-xs mb-3">{error}</p>
-      )}
+      <div className="mb-4">
+        <label className="block text-[11px] font-semibold tracking-[0.08em] uppercase text-ink-muted mb-1.5">
+          Password
+        </label>
+        <input
+          type="password"
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="••••••••"
+          className="w-full bg-surface border border-border rounded-[10px] px-3.5 py-3 text-sm text-ink placeholder-[#BEB5A8] outline-none focus:border-accent"
+          autoFocus
+        />
+      </div>
+      {error && <p className="text-[#DC2626] text-xs mb-3">{error}</p>}
       <button
         type="submit"
-        disabled={isLoading || !email}
+        disabled={isLoading || !password}
         className="w-full bg-accent text-white rounded-[14px] py-4 text-[15px] font-semibold disabled:opacity-50"
       >
-        {isLoading ? "Sending…" : "Send magic link"}
+        {isLoading ? "Signing in…" : "Sign in"}
       </button>
     </form>
   );

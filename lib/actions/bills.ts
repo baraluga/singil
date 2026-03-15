@@ -1,7 +1,10 @@
 "use server";
 
-import { createClient } from "@/lib/supabase-server";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 import { MemberInput } from "@/lib/types";
+
+// Fixed creator ID — single-user app, no auth.users dependency needed
+const CREATOR_ID = "00000000-0000-0000-0000-000000000001";
 
 interface CreateBillInput {
   name: string;
@@ -13,15 +16,10 @@ interface CreateBillInput {
 }
 
 export async function createBill(data: CreateBillInput): Promise<{ id: string } | { error: string }> {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) return { error: "Not authenticated" };
-
-  const { data: bill, error: billError } = await supabase
+  const { data: bill, error: billError } = await supabaseAdmin
     .from("bills")
     .insert({
-      user_id: user.id,
+      user_id: CREATOR_ID,
       name: data.name,
       date: data.date,
       total_amount: data.totalAmount,
@@ -33,7 +31,7 @@ export async function createBill(data: CreateBillInput): Promise<{ id: string } 
 
   if (billError || !bill) return { error: billError?.message ?? "Failed to create bill" };
 
-  const { error: membersError } = await supabase.from("members").insert(
+  const { error: membersError } = await supabaseAdmin.from("members").insert(
     data.members.map((m) => ({
       bill_id: bill.id,
       name: m.name,
