@@ -5,7 +5,9 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const isProtected =
-    pathname.startsWith("/bills") || pathname.startsWith("/settings");
+    pathname.startsWith("/bills") ||
+    pathname.startsWith("/settings") ||
+    pathname.startsWith("/collections");
 
   if (!isProtected) return NextResponse.next();
 

@@ -1,30 +1,52 @@
 import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabase-admin";
-import { BillWithMembers } from "@/lib/types";
-import BillCard from "@/components/bills/BillCard";
+import { BillWithMembers, CollectionWithBills } from "@/lib/types";
 import LogoutButton from "@/components/LogoutButton";
+import BillsTabs from "@/components/bills/BillsTabs";
 
 export default async function BillsPage() {
   const supabase = supabaseAdmin;
 
-  const { data: bills } = await supabase
-    .from("bills")
-    .select("*")
-    .order("date", { ascending: false });
+  const [{ data: bills }, { data: collections }] = await Promise.all([
+    supabase.from("bills").select("*").order("date", { ascending: false }),
+    supabase.from("collections").select("*").order("created_at", { ascending: false }),
+  ]);
 
   const billIds = (bills ?? []).map((b) => b.id);
+  const collectionIds = (collections ?? []).map((c) => c.id);
 
-  const { data: members } = billIds.length
-    ? await supabase.from("members").select("*").in("bill_id", billIds)
-    : { data: [] };
+  const [membersResult, junctionResult] = await Promise.all([
+    billIds.length
+      ? supabase.from("members").select("*").in("bill_id", billIds)
+      : Promise.resolve({ data: [] }),
+    collectionIds.length
+      ? supabase.from("collection_bills").select("*").in("collection_id", collectionIds)
+      : Promise.resolve({ data: [] }),
+  ]);
+
+  const allMembers = membersResult.data ?? [];
+  const junctionRows = junctionResult.data ?? [];
 
   const billsWithMembers: BillWithMembers[] = (bills ?? []).map((bill) => ({
     ...bill,
-    members: (members ?? []).filter((m) => m.bill_id === bill.id),
+    members: allMembers.filter((m) => m.bill_id === bill.id),
   }));
 
   const activeBills = billsWithMembers.filter((b) => !b.is_settled);
   const settledBills = billsWithMembers.filter((b) => b.is_settled);
+
+  const collectionsWithBills: CollectionWithBills[] = (collections ?? []).map((c) => {
+    const collectionBillIds = junctionRows
+      .filter((r) => r.collection_id === c.id)
+      .sort((a, b) => a.sort_order - b.sort_order)
+      .map((r) => r.bill_id);
+    return {
+      ...c,
+      bills: collectionBillIds
+        .map((id) => billsWithMembers.find((b) => b.id === id))
+        .filter(Boolean) as BillWithMembers[],
+    };
+  });
 
   return (
     <main className="page">
@@ -33,7 +55,7 @@ export default async function BillsPage() {
           <div>
             <h1 className="dash-title">Singil</h1>
             <p className="dash-sub">
-              {activeBills.length} active · {settledBills.length} settled
+              {activeBills.length} active · {settledBills.length} settled · {collectionsWithBills.length} collections
             </p>
           </div>
           <div className="dash-actions">
@@ -42,35 +64,11 @@ export default async function BillsPage() {
           </div>
         </div>
 
-        {billsWithMembers.length === 0 && (
-          <div className="empty-state">
-            <div className="empty-state-icon">🧾</div>
-            <p className="empty-state-title">No bills yet</p>
-            <p className="empty-state-sub">Create your first bill to get started</p>
-          </div>
-        )}
-
-        {activeBills.length > 0 && (
-          <>
-            <div className="section-label">Active</div>
-            <div className="bills-grid">
-              {activeBills.map((bill) => (
-                <BillCard key={bill.id} bill={bill} />
-              ))}
-            </div>
-          </>
-        )}
-
-        {settledBills.length > 0 && (
-          <div style={{ marginTop: 20 }}>
-            <div className="section-label">Settled</div>
-            <div className="bills-grid">
-              {settledBills.map((bill) => (
-                <BillCard key={bill.id} bill={bill} settled />
-              ))}
-            </div>
-          </div>
-        )}
+        <BillsTabs
+          activeBills={activeBills}
+          settledBills={settledBills}
+          collections={collectionsWithBills}
+        />
 
         <div style={{ textAlign: "center", marginTop: 32 }}>
           <LogoutButton />
