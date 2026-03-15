@@ -807,6 +807,251 @@ body {
   color: var(--ink-muted);
 }
 
+/* ── PAYEE PAGE ── */
+.pay-page {
+  min-height: 100vh;
+  background: var(--bg);
+  padding-bottom: 48px;
+}
+.pay-header {
+  background: var(--ink);
+  padding: 24px 20px 28px;
+  margin-bottom: 24px;
+}
+.pay-header-sub {
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 4px;
+}
+.pay-header-title {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  color: #fff;
+}
+.pay-header-date {
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+  margin-top: 4px;
+}
+.pay-inner {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+@media (min-width: 640px) {
+  .pay-header {
+    padding: 32px 40px 36px;
+  }
+  .pay-inner {
+    max-width: 600px;
+    padding: 0 40px;
+  }
+}
+@media (min-width: 1024px) {
+  .pay-header {
+    padding: 40px 60px 44px;
+  }
+  .pay-inner {
+    max-width: 720px;
+    padding: 0 60px;
+  }
+}
+.pay-back-btn {
+  background: none;
+  border: none;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--accent);
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+/* ── NAME PICKER ── */
+.name-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.name-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 10px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  position: relative;
+}
+.name-card:hover {
+  border-color: var(--accent);
+}
+.name-card.done {
+  opacity: 0.5;
+}
+.name-card-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  text-align: center;
+  line-height: 1.2;
+  word-break: break-word;
+}
+.name-card-status {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-size: 11px;
+}
+
+/* ── SHARE CARD ── */
+.share-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+}
+.share-card-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 6px;
+}
+.share-amount {
+  font-family: var(--font-serif);
+  font-size: 36px;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.share-breakdown {
+  font-size: 12px;
+  color: var(--ink-muted);
+  margin-bottom: 14px;
+}
+.share-copy-btn {
+  background: var(--accent-light);
+  color: var(--accent);
+  border: none;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ── RECEIPT LINK ── */
+.receipt-link-btn {
+  display: block;
+  width: 100%;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-muted);
+  cursor: pointer;
+  text-align: left;
+  margin-bottom: 4px;
+}
+.receipt-link-btn:hover {
+  border-color: var(--accent);
+  color: var(--ink);
+}
+
+/* ── PAYMENT METHOD CARD ── */
+.payment-card {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  text-align: left;
+  gap: 12px;
+}
+.payment-card:hover {
+  border-color: var(--accent);
+}
+.payment-card.no-qr {
+  cursor: default;
+  opacity: 0.7;
+}
+.payment-card-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.payment-card-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.payment-card-hint {
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+.payment-card-arrow {
+  color: var(--ink-muted);
+  font-size: 16px;
+}
+
+/* ── EMPTY PAYMENT METHODS ── */
+.pay-empty-methods {
+  font-size: 13px;
+  color: var(--ink-muted);
+  padding: 14px 0;
+}
+
+/* ── CLAIM BUTTON ── */
+.btn-claim {
+  width: 100%;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  padding: 16px;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+}
+.btn-claim:disabled {
+  cursor: not-allowed;
+}
+.btn-claim.confirmed {
+  background: var(--green);
+}
+.btn-claim.waiting {
+  background: var(--border);
+  color: var(--ink-muted);
+}
+
+/* ── QR MODAL LABEL ── */
+.qr-modal-label {
+  color: #fff;
+  font-family: var(--font-serif);
+  font-size: 22px;
+  text-align: center;
+}
+
 /* ── TOAST ── */
 .toast {
   position: fixed;

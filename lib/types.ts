@@ -33,3 +33,14 @@ export interface MemberInput {
 }
 
 export type SplitMode = "equal" | "manual";
+
+export interface PaymentMethod {
+  id: string;
+  user_id: string;
+  name: string;
+  qr_url: string | null;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
