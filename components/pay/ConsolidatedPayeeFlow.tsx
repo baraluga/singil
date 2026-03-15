@@ -292,6 +292,15 @@ export default function ConsolidatedPayeeFlow({
                 </div>
               ))}
             </div>
+            <button
+              className="share-copy-btn"
+              onClick={async () => {
+                await navigator.clipboard.writeText(String(Math.round(grandTotal * 100) / 100));
+                setToastMsg("Amount copied!");
+              }}
+            >
+              Copy amount
+            </button>
           </div>
 
           {/* Payment methods */}
