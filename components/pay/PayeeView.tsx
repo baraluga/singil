@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Bill, Member, PaymentMethod } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils/currency";
+import { calcScPerPerson } from "@/lib/utils/split";
 import { getAvatarColor, getInitial } from "@/lib/utils/avatars";
 import Modal from "@/components/ui/Modal";
 import Toast from "@/components/ui/Toast";
@@ -53,7 +54,7 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
 
   const isHonesty = bill.split_mode === "honesty";
   const honestyAmount = honestyItems.reduce((s, v) => s + v, 0);
-  const scPerPerson = bill.service_charge_amount / Math.max(members.length + 1, 1);
+  const scPerPerson = calcScPerPerson(bill.service_charge_amount, members.length);
   const honestyTotal = honestyAmount + scPerPerson;
 
   const selectedMember = members.find((m) => m.id === selectedMemberId) ?? null;

@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { BillWithMembers, Member, PaymentMethod } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils/currency";
+import { calcScPerPerson } from "@/lib/utils/split";
 import Modal from "@/components/ui/Modal";
 import Toast from "@/components/ui/Toast";
 import PaymentMethodCard from "@/components/pay/PaymentMethodCard";
@@ -40,7 +41,7 @@ export default function CollectionBillCard({
 
   const isHonesty = bill.split_mode === "honesty";
   const honestyAmount = honestyItems.reduce((s, v) => s + v, 0);
-  const scPerPerson = bill.service_charge_amount / Math.max(bill.members.length + 1, 1);
+  const scPerPerson = calcScPerPerson(bill.service_charge_amount, bill.members.length);
   const honestyTotal = honestyAmount + scPerPerson;
 
   const isPaid = member.is_paid;

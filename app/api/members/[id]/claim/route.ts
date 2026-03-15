@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import { calcScPerPerson } from "@/lib/utils/split";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_SIZE = 2 * 1024 * 1024; // 2MB
@@ -86,7 +87,7 @@ export async function POST(
     }
   }
 
-  const scPerPerson = (bill?.service_charge_amount ?? 0) / Math.max((memberCount ?? 1) + 1, 1);
+  const scPerPerson = calcScPerPerson(bill?.service_charge_amount ?? 0, memberCount ?? 0);
   const computedShareAmount = isHonesty && honestyFoodAmount
     ? Math.round((honestyFoodAmount + scPerPerson) * 100) / 100
     : null;

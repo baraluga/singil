@@ -1,4 +1,12 @@
 /**
+ * SC is split equally among members + the bill owner (N+1).
+ * memberCount is the number of payee members (excluding the owner).
+ */
+export function calcScPerPerson(scAmount: number, memberCount: number): number {
+  return scAmount / Math.max(memberCount + 1, 1);
+}
+
+/**
  * Splits a grand total (SC-inclusive) equally among members.
  * Remainder cents go to the first member.
  */

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { formatCurrency } from "@/lib/utils/currency";
+import { calcScPerPerson } from "@/lib/utils/split";
 import MemberDetailRow from "@/components/bills/MemberDetailRow";
 import ShareButtons from "@/components/bills/ShareButtons";
 import ReceiptThumbnail from "@/components/bills/ReceiptThumbnail";
@@ -77,7 +78,7 @@ export default async function BillDetailPage({ params }: { params: Promise<{ id:
           <MemberDetailRow
             key={member.id}
             member={member}
-            scPerPerson={bill.service_charge_amount / Math.max(memberList.length + 1, 1)}
+            scPerPerson={calcScPerPerson(bill.service_charge_amount, memberList.length)}
             index={i}
             billId={bill.id}
           />
