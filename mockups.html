@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=375px, maximum-scale=1">
+<title>Singil – Mockups</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F5F0E8;
+    --surface: #FDFAF4;
+    --ink: #1A1612;
+    --ink-muted: #6B6358;
+    --accent: #D4522A;
+    --accent-light: #F5E6DF;
+    --green: #2A7A4B;
+    --green-light: #DFF0E8;
+    --border: #E2DBD0;
+    --shadow: 0 2px 16px rgba(26,22,18,0.08);
+    --radius: 16px;
+  }
+
+  body {
+    background: #2C2520;
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 80px;
+    gap: 0;
+  }
+
+  .stage-label {
+    color: #8A7A70;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    margin-top: 48px;
+    align-self: flex-start;
+    max-width: 375px;
+    width: 100%;
+  }
+  .stage-label:first-of-type { margin-top: 0; }
+
+  /* Phone shell */
+  .phone {
+    width: 375px;
+    min-height: 650px;
+    background: var(--bg);
+    border-radius: 40px;
+    overflow: hidden;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.06);
+    position: relative;
+  }
+
+  /* Status bar */
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 24px 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .status-bar .notch {
+    width: 100px;
+    height: 20px;
+    background: var(--ink);
+    border-radius: 20px;
+  }
+
+  /* Screen content */
+  .screen { padding: 16px 20px 32px; }
+
+  /* ── DASHBOARD ── */
+  .dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 28px;
+    margin-top: 8px;
+  }
+  .dash-title { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--ink); line-height: 1.1; }
+  .dash-sub { font-size: 13px; color: var(--ink-muted); margin-top: 2px; }
+  .btn-new {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 10px;
+  }
+
+  .bill-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+  .bill-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+  .bill-name { font-weight: 600; font-size: 15px; color: var(--ink); }
+  .bill-date { font-size: 12px; color: var(--ink-muted); margin-top: 2px; }
+  .bill-amount { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--ink); }
+  .bill-amount span { font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--ink-muted); display: block; text-align: right; }
+
+  .members-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .member-chip {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 20px;
+    background: var(--accent-light);
+    color: var(--accent);
+  }
+  .member-chip.paid {
+    background: var(--green-light);
+    color: var(--green);
+  }
+  .member-chip.pending {
+    background: #F5F0E8;
+    color: var(--ink-muted);
+    border: 1px solid var(--border);
+  }
+
+  .progress-bar-wrap {
+    height: 4px;
+    background: var(--border);
+    border-radius: 4px;
+    margin: 12px 0 10px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: var(--green);
+  }
+  .progress-label {
+    font-size: 11px;
+    color: var(--ink-muted);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* ── CREATE BILL ── */
+  .nav-back {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--accent);
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 16px;
+    margin-top: 8px;
+  }
+  .form-title { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--ink); margin-bottom: 20px; }
+
+  .field-group { margin-bottom: 16px; }
+  .field-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 6px; }
+  .field-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    outline: none;
+  }
+  .field-input.focused { border-color: var(--accent); }
+  .field-input::placeholder { color: #BEB5A8; }
+
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .receipt-upload {
+    width: 100%;
+    height: 80px;
+    background: var(--surface);
+    border: 1.5px dashed var(--border);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    color: var(--ink-muted);
+    font-size: 12px;
+  }
+  .receipt-upload .icon { font-size: 20px; }
+
+  .members-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+  .member-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+  .member-avatar {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .member-name { flex: 1; font-size: 14px; font-weight: 500; color: var(--ink); }
+  .member-amount { font-size: 14px; font-weight: 600; color: var(--ink); }
+  .member-amount-input {
+    width: 90px;
+    background: var(--accent-light);
+    border: none;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    text-align: right;
+  }
+  .add-member-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: 1.5px dashed var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: var(--ink-muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .split-toggle {
+    display: flex;
+    background: var(--border);
+    border-radius: 10px;
+    padding: 3px;
+    gap: 2px;
+    margin-bottom: 16px;
+  }
+  .split-opt {
+    flex: 1;
+    padding: 7px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    color: var(--ink-muted);
+    cursor: pointer;
+  }
+  .split-opt.active { background: var(--surface); color: var(--ink); box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+
+  .reconcile-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--accent-light);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-top: 4px;
+    margin-bottom: 16px;
+  }
+  .reconcile-label { font-size: 12px; color: var(--accent); font-weight: 500; }
+  .reconcile-val { font-size: 14px; font-weight: 700; color: var(--accent); }
+
+  .btn-primary {
+    width: 100%;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    padding: 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* ── BILL DETAIL ── */
+  .bill-detail-header {
+    background: var(--ink);
+    margin: -16px -20px 20px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .bill-detail-header::after {
+    content: '';
+    position: absolute;
+    right: -30px; top: -30px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: rgba(212,82,42,0.15);
+  }
+  .bill-detail-name { font-family: 'DM Serif Display', serif; font-size: 22px; color: #fff; }
+  .bill-detail-meta { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+  .bill-detail-total { font-family: 'DM Serif Display', serif; font-size: 36px; color: #fff; margin-top: 10px; }
+  .bill-detail-total span { font-family: 'DM Sans', sans-serif; font-size: 13px; color: rgba(255,255,255,0.5); }
+
+  .receipt-thumb {
+    width: 48px; height: 48px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    cursor: pointer;
+    position: absolute;
+    right: 20px; top: 20px;
+  }
+
+  .share-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .btn-share {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .btn-share.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .member-detail-row {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .member-detail-info { flex: 1; }
+  .member-detail-name { font-size: 14px; font-weight: 600; color: var(--ink); }
+  .member-detail-sub { font-size: 12px; color: var(--ink-muted); margin-top: 1px; }
+  .member-detail-amount { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--ink); }
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 20px;
+  }
+  .status-badge.paid { background: var(--green-light); color: var(--green); }
+  .status-badge.pending { background: #F5F0E8; color: var(--ink-muted); border: 1px solid var(--border); }
+  .status-badge.claimed { background: #FEF3C7; color: #92400E; }
+
+  .mark-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink-muted);
+    cursor: pointer;
+  }
+  .mark-btn.confirm { border-color: var(--green); color: var(--green); }
+
+  /* ── PAYEE VIEW ── */
+  .payee-hero {
+    text-align: center;
+    padding: 24px 0 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .payee-from { font-size: 12px; color: var(--ink-muted); margin-bottom: 4px; }
+  .payee-occasion { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--ink); }
+  .payee-date { font-size: 12px; color: var(--ink-muted); margin-top: 2px; }
+
+  .name-picker-label { font-size: 13px; font-weight: 500; color: var(--ink-muted); margin-bottom: 10px; text-align: center; }
+  .name-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+  .name-option {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .name-option.selected { border-color: var(--accent); background: var(--accent-light); }
+  .name-option-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--border);
+    margin: 0 auto 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; color: var(--ink-muted);
+  }
+  .name-option.selected .name-option-avatar { background: var(--accent); color: #fff; }
+  .name-option-name { font-size: 13px; font-weight: 600; color: var(--ink); }
+
+  .your-share-card {
+    background: var(--ink);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .your-share-card::before {
+    content: '';
+    position: absolute;
+    right: -20px; bottom: -20px;
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    background: rgba(212,82,42,0.2);
+  }
+  .your-share-label { font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 4px; }
+  .your-share-amount { font-family: 'DM Serif Display', serif; font-size: 40px; color: #fff; }
+  .your-share-breakdown { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+  .copy-btn {
+    position: absolute;
+    right: 20px; top: 50%; transform: translateY(-50%);
+    background: rgba(255,255,255,0.1);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .pay-to-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 10px; }
+  .qr-row { display: flex; gap: 8px; margin-bottom: 20px; }
+  .qr-card {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 10px;
+    text-align: center;
+    cursor: pointer;
+  }
+  .qr-icon { font-size: 28px; margin-bottom: 4px; }
+  .qr-name { font-size: 12px; font-weight: 600; color: var(--ink); }
+  .qr-handle { font-size: 10px; color: var(--ink-muted); }
+
+  .receipt-proof {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    cursor: pointer;
+  }
+  .receipt-proof-icon { font-size: 20px; }
+  .receipt-proof-text { font-size: 13px; font-weight: 500; color: var(--ink); }
+  .receipt-proof-sub { font-size: 11px; color: var(--ink-muted); }
+
+  .btn-paid {
+    width: 100%;
+    background: var(--green);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    padding: 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  /* Connector */
+  .flow-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 0;
+    color: #5A4A40;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    gap: 4px;
+  }
+  .flow-connector::before, .flow-connector::after {
+    content: '';
+    width: 1px;
+    height: 16px;
+    background: #3A2E28;
+  }
+</style>
+</head>
+<body>
+
+<!-- ── SCREEN 1: DASHBOARD ── -->
+<div class="stage-label">① Dashboard — Your bills</div>
+<div class="phone">
+  <div class="status-bar"><span>9:41</span><div class="notch"></div><span>● ●●</span></div>
+  <div class="screen">
+    <div class="dash-header">
+      <div>
+        <div class="dash-title">Singil</div>
+        <div class="dash-sub">2 active · 1 settled</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="btn-new" style="background:var(--surface);color:var(--ink);border:1px solid var(--border);padding:10px 12px;">⚙️</button>
+        <button class="btn-new">＋ New bill</button>
+      </div>
+    </div>
+
+    <div class="section-label">Active</div>
+
+    <div class="bill-card">
+      <div class="bill-card-top">
+        <div>
+          <div class="bill-name">Ramen Nagi, BGC</div>
+          <div class="bill-date">Mar 15 · 5 people</div>
+        </div>
+        <div><div class="bill-amount">₱3,280</div><span>total</span></div>
+      </div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:60%"></div></div>
+      <div class="progress-label"><span>3 of 5 paid</span><span>₱1,312 remaining</span></div>
+      <div class="members-row" style="margin-top:10px;">
+        <span class="member-chip paid">✓ Maj</span>
+        <span class="member-chip paid">✓ Nico</span>
+        <span class="member-chip paid">✓ Sam</span>
+        <span class="member-chip pending">Mark</span>
+        <span class="member-chip pending">Jas</span>
+      </div>
+    </div>
+
+    <div class="bill-card">
+      <div class="bill-card-top">
+        <div>
+          <div class="bill-name">Poblacion Bar Crawl</div>
+          <div class="bill-date">Mar 12 · 3 people</div>
+        </div>
+        <div><div class="bill-amount">₱2,100</div><span>total</span></div>
+      </div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:33%"></div></div>
+      <div class="progress-label"><span>1 of 3 paid</span><span>₱1,400 remaining</span></div>
+      <div class="members-row" style="margin-top:10px;">
+        <span class="member-chip paid">✓ Nico</span>
+        <span class="member-chip pending">Dani</span>
+        <span class="member-chip pending">Rex</span>
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-top:20px;">Settled</div>
+    <div class="bill-card" style="opacity:0.6;">
+      <div class="bill-card-top">
+        <div>
+          <div class="bill-name">Wildflour Brunch</div>
+          <div class="bill-date">Mar 8 · 4 people</div>
+        </div>
+        <div><div class="bill-amount">₱4,600</div><span>settled ✓</span></div>
+      </div>
+      <div class="members-row">
+        <span class="member-chip paid">✓ All paid</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="flow-connector">create new bill</div>
+
+<!-- ── SCREEN 2: CREATE BILL ── -->
+<div class="stage-label">② Create Bill</div>
+<div class="phone">
+  <div class="status-bar"><span>9:41</span><div class="notch"></div><span>● ●●</span></div>
+  <div class="screen">
+    <div class="nav-back">← Bills</div>
+    <div class="form-title">New Bill</div>
+
+    <div class="field-group">
+      <div class="field-label">Restaurant / Occasion</div>
+      <input class="field-input focused" type="text" placeholder="e.g. Ramen Nagi, BGC" value="Ramen Nagi, BGC">
+    </div>
+
+    <div class="row-2">
+      <div class="field-group">
+        <div class="field-label">Date</div>
+        <input class="field-input" type="text" value="Mar 15, 2026">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Service Charge</div>
+        <input class="field-input" type="text" placeholder="0%" value="10%">
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Total Bill Amount</div>
+      <input class="field-input" type="text" placeholder="₱0.00" value="₱3,280">
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Receipt Photo</div>
+      <div class="receipt-upload">
+        <span class="icon">📷</span>
+        <span>Tap to upload receipt</span>
+      </div>
+    </div>
+
+    <div class="field-label" style="margin-bottom:8px;">Split Mode</div>
+    <div class="split-toggle">
+      <div class="split-opt active">Equal split</div>
+      <div class="split-opt">Manual</div>
+    </div>
+
+    <div class="field-label" style="margin-bottom:8px;">Members</div>
+    <div class="members-list">
+      <div class="member-row">
+        <div class="member-avatar">M</div>
+        <div class="member-name">Maj</div>
+        <div class="member-amount">₱656</div>
+      </div>
+      <div class="member-row">
+        <div class="member-avatar" style="background:#E8F0E0;color:#2A7A4B;">N</div>
+        <div class="member-name">Nico</div>
+        <div class="member-amount">₱656</div>
+      </div>
+      <div class="member-row">
+        <div class="member-avatar" style="background:#E0E8F5;color:#2A4A7A;">S</div>
+        <div class="member-name">Sam</div>
+        <div class="member-amount">₱656</div>
+      </div>
+    </div>
+    <button class="add-member-btn">＋ Add member</button>
+
+    <div class="reconcile-row" style="margin-top:16px;">
+      <div class="reconcile-label">Total assigned</div>
+      <div class="reconcile-val">₱1,968 / ₱3,280</div>
+    </div>
+
+    <button class="btn-primary">Create Bill & Get Link →</button>
+  </div>
+</div>
+
+<div class="flow-connector">bill created → open bill</div>
+
+<!-- ── SCREEN 3: BILL DETAIL (YOUR VIEW) ── -->
+<div class="stage-label">③ Bill Detail — Your view</div>
+<div class="phone">
+  <div class="status-bar"><span>9:41</span><div class="notch"></div><span>● ●●</span></div>
+  <div class="screen">
+    <div class="nav-back">← Bills</div>
+
+    <div class="bill-detail-header">
+      <div class="receipt-thumb">🧾</div>
+      <div class="bill-detail-name">Ramen Nagi, BGC</div>
+      <div class="bill-detail-meta">Mar 15, 2026 · 5 members · SC 10%</div>
+      <div class="bill-detail-total">₱3,280 <span>total</span></div>
+    </div>
+
+    <div class="share-row">
+      <button class="btn-share">🔗 Copy link</button>
+      <button class="btn-share primary">Share to group →</button>
+    </div>
+
+    <div class="section-label">Members</div>
+
+    <div class="member-detail-row">
+      <div class="member-avatar">M</div>
+      <div class="member-detail-info">
+        <div class="member-detail-name">Maj</div>
+        <div class="member-detail-sub">₱596 + ₱60 SC</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+        <div class="member-detail-amount">₱656</div>
+        <div class="status-badge paid">✓ Paid</div>
+      </div>
+    </div>
+
+    <div class="member-detail-row">
+      <div class="member-avatar" style="background:#E8F0E0;color:#2A7A4B;">N</div>
+      <div class="member-detail-info">
+        <div class="member-detail-name">Nico</div>
+        <div class="member-detail-sub">₱596 + ₱60 SC</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+        <div class="member-detail-amount">₱656</div>
+        <div class="status-badge paid">✓ Paid</div>
+      </div>
+    </div>
+
+    <div class="member-detail-row">
+      <div class="member-avatar" style="background:#FEF3C7;color:#92400E;">K</div>
+      <div class="member-detail-info">
+        <div class="member-detail-name">Mark</div>
+        <div class="member-detail-sub">₱596 + ₱60 SC · claimed paid</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+        <div class="member-detail-amount">₱656</div>
+        <div class="status-badge claimed">⚡ Claimed</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin:-4px 0 8px;padding-left:52px;">
+      <button class="mark-btn confirm">✓ Confirm</button>
+      <button class="mark-btn">✗ Dismiss</button>
+    </div>
+
+    <div class="member-detail-row">
+      <div class="member-avatar" style="background:#E0E8F5;color:#2A4A7A;">S</div>
+      <div class="member-detail-info">
+        <div class="member-detail-name">Sam</div>
+        <div class="member-detail-sub">₱596 + ₱60 SC</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+        <div class="member-detail-amount">₱656</div>
+        <div class="status-badge pending">Pending</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin:-4px 0 8px;padding-left:52px;">
+      <button class="mark-btn confirm">✓ Mark paid</button>
+    </div>
+
+    <div class="member-detail-row">
+      <div class="member-avatar" style="background:#F0E0E8;color:#7A2A4A;">J</div>
+      <div class="member-detail-info">
+        <div class="member-detail-name">Jas</div>
+        <div class="member-detail-sub">₱596 + ₱60 SC</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+        <div class="member-detail-amount">₱656</div>
+        <div class="status-badge pending">Pending</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin:-4px 0 8px;padding-left:52px;">
+      <button class="mark-btn confirm">✓ Mark paid</button>
+    </div>
+
+  </div>
+</div>
+
+<div class="flow-connector">share link → payee opens</div>
+
+<!-- ── SCREEN 4: PAYEE VIEW ── -->
+<div class="stage-label">④ Payee View — What your friend sees</div>
+<div class="phone">
+  <div class="status-bar"><span>9:41</span><div class="notch"></div><span>● ●●</span></div>
+  <div class="screen">
+
+    <div class="payee-hero">
+      <div class="payee-from">Brian is collecting for</div>
+      <div class="payee-occasion">Ramen Nagi, BGC</div>
+      <div class="payee-date">March 15, 2026</div>
+    </div>
+
+    <div class="name-picker-label">Who are you?</div>
+    <div class="name-grid">
+      <div class="name-option">
+        <div class="name-option-avatar">M</div>
+        <div class="name-option-name">Maj</div>
+      </div>
+      <div class="name-option selected">
+        <div class="name-option-avatar">N</div>
+        <div class="name-option-name">Nico</div>
+      </div>
+      <div class="name-option">
+        <div class="name-option-avatar">K</div>
+        <div class="name-option-name">Mark</div>
+      </div>
+      <div class="name-option">
+        <div class="name-option-avatar">S</div>
+        <div class="name-option-name">Sam</div>
+      </div>
+    </div>
+
+    <div class="your-share-card">
+      <div class="your-share-label">Your share</div>
+      <div class="your-share-amount">₱656</div>
+      <div class="your-share-breakdown">₱596 food + ₱60 service charge (10%)</div>
+      <button class="copy-btn">Copy</button>
+    </div>
+
+    <div class="pay-to-label">Pay Brian via</div>
+    <div class="qr-row">
+      <div class="qr-card">
+        <div class="qr-icon">💙</div>
+        <div class="qr-name">GCash</div>
+      </div>
+      <div class="qr-card">
+        <div class="qr-icon">💜</div>
+        <div class="qr-name">Maya</div>
+      </div>
+      <div class="qr-card">
+        <div class="qr-icon">🏦</div>
+        <div class="qr-name">BDO</div>
+      </div>
+    </div>
+
+    <div class="receipt-proof">
+      <div class="receipt-proof-icon">🧾</div>
+      <div>
+        <div class="receipt-proof-text">View receipt</div>
+        <div class="receipt-proof-sub">Tap to verify the bill</div>
+      </div>
+      <span style="margin-left:auto;color:var(--ink-muted);">›</span>
+    </div>
+
+    <button class="btn-paid">✓ I already paid</button>
+
+  </div>
+</div>
+
+<div class="flow-connector">tap a QR card</div>
+
+<!-- ── SCREEN 5b: QR MODAL ── -->
+<div class="stage-label">④b Payee View — QR Modal (tap any payment method)</div>
+<div class="phone">
+  <div class="status-bar" style="position:relative;z-index:2;"><span>9:41</span><div class="notch"></div><span>● ●●</span></div>
+  <!-- Dimmed background -->
+  <div style="position:relative;">
+    <!-- Blurred payee bg suggestion -->
+    <div style="padding:16px 20px;filter:blur(2px);opacity:0.3;pointer-events:none;">
+      <div class="your-share-card" style="margin-bottom:12px;">
+        <div class="your-share-label">Your share</div>
+        <div class="your-share-amount">₱656</div>
+      </div>
+      <div class="pay-to-label">Pay Brian via</div>
+      <div class="qr-row">
+        <div class="qr-card"><div class="qr-icon">💙</div><div class="qr-name">GCash</div></div>
+        <div class="qr-card"><div class="qr-icon">💜</div><div class="qr-name">Maya</div></div>
+        <div class="qr-card"><div class="qr-icon">🏦</div><div class="qr-name">BDO</div></div>
+      </div>
+    </div>
+
+    <!-- Modal overlay -->
+    <div style="
+      position:absolute;
+      inset:0;
+      background:rgba(26,22,18,0.7);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      gap:16px;
+    ">
+      <!-- Modal card -->
+      <div style="
+        background:var(--surface);
+        border-radius:20px;
+        padding:24px;
+        width:100%;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        gap:16px;
+        box-shadow:0 24px 64px rgba(0,0,0,0.4);
+      ">
+        <div style="font-size:13px;font-weight:600;color:var(--ink-muted);letter-spacing:0.08em;text-transform:uppercase;">Scan to pay via</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:26px;color:var(--ink);">💙 GCash</div>
+
+        <!-- QR code placeholder -->
+        <div style="
+          width:200px;height:200px;
+          background:var(--bg);
+          border-radius:12px;
+          border:1px solid var(--border);
+          display:flex;flex-direction:column;
+          align-items:center;justify-content:center;
+          gap:8px;
+          color:var(--ink-muted);
+          font-size:12px;
+        ">
+          <!-- Simulated QR grid -->
+          <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Top-left finder -->
+            <rect x="4" y="4" width="34" height="34" rx="4" fill="#1A1612"/>
+            <rect x="10" y="10" width="22" height="22" rx="2" fill="#F5F0E8"/>
+            <rect x="15" y="15" width="12" height="12" rx="1" fill="#1A1612"/>
+            <!-- Top-right finder -->
+            <rect x="82" y="4" width="34" height="34" rx="4" fill="#1A1612"/>
+            <rect x="88" y="10" width="22" height="22" rx="2" fill="#F5F0E8"/>
+            <rect x="93" y="15" width="12" height="12" rx="1" fill="#1A1612"/>
+            <!-- Bottom-left finder -->
+            <rect x="4" y="82" width="34" height="34" rx="4" fill="#1A1612"/>
+            <rect x="10" y="88" width="22" height="22" rx="2" fill="#F5F0E8"/>
+            <rect x="15" y="93" width="12" height="12" rx="1" fill="#1A1612"/>
+            <!-- Data dots pattern -->
+            <rect x="46" y="4" width="6" height="6" fill="#1A1612"/>
+            <rect x="56" y="4" width="6" height="6" fill="#1A1612"/>
+            <rect x="66" y="4" width="6" height="6" fill="#1A1612"/>
+            <rect x="46" y="14" width="6" height="6" fill="#1A1612"/>
+            <rect x="66" y="14" width="6" height="6" fill="#1A1612"/>
+            <rect x="56" y="24" width="6" height="6" fill="#1A1612"/>
+            <rect x="46" y="46" width="6" height="6" fill="#1A1612"/>
+            <rect x="56" y="46" width="6" height="6" fill="#1A1612"/>
+            <rect x="66" y="46" width="6" height="6" fill="#1A1612"/>
+            <rect x="76" y="46" width="6" height="6" fill="#1A1612"/>
+            <rect x="46" y="56" width="6" height="6" fill="#1A1612"/>
+            <rect x="66" y="56" width="6" height="6" fill="#1A1612"/>
+            <rect x="46" y="66" width="6" height="6" fill="#1A1612"/>
+            <rect x="56" y="66" width="6" height="6" fill="#1A1612"/>
+            <rect x="76" y="66" width="6" height="6" fill="#1A1612"/>
+            <rect x="56" y="76" width="6" height="6" fill="#1A1612"/>
+            <rect x="66" y="76" width="6" height="6" fill="#1A1612"/>
+            <rect x="76" y="76" width="6" height="6" fill="#1A1612"/>
+            <rect x="46" y="86" width="6" height="6" fill="#1A1612"/>
+            <rect x="66" y="96" width="6" height="6" fill="#1A1612"/>
+            <rect x="76" y="86" width="6" height="6" fill="#1A1612"/>
+            <rect x="86" y="46" width="6" height="6" fill="#1A1612"/>
+            <rect x="96" y="56" width="6" height="6" fill="#1A1612"/>
+            <rect x="86" y="66" width="6" height="6" fill="#1A1612"/>
+            <rect x="96" y="76" width="6" height="6" fill="#1A1612"/>
+            <rect x="106" y="46" width="6" height="6" fill="#1A1612"/>
+            <rect x="106" y="66" width="6" height="6" fill="#1A1612"/>
+            <rect x="4" y="46" width="6" height="6" fill="#1A1612"/>
+            <rect x="14" y="56" width="6" height="6" fill="#1A1612"/>
+            <rect x="24" y="46" width="6" height="6" fill="#1A1612"/>
+            <rect x="34" y="56" width="6" height="6" fill="#1A1612"/>
+            <rect x="14" y="66" width="6" height="6" fill="#1A1612"/>
+            <rect x="34" y="66" width="6" height="6" fill="#1A1612"/>
+            <rect x="4" y="56" width="6" height="6" fill="#1A1612"/>
+          </svg>
+          <span style="font-size:10px;color:var(--ink-muted);">Your uploaded QR here</span>
+        </div>
+
+        <div style="font-size:12px;color:var(--ink-muted);text-align:center;">Open your GCash app and scan</div>
+      </div>
+
+      <!-- Dismiss hint -->
+      <div style="font-size:12px;color:rgba(255,255,255,0.4);letter-spacing:0.05em;">Tap anywhere to dismiss</div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* ── SETTINGS STYLES ── */
+  .pm-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: var(--shadow);
+  }
+  .pm-qr-thumb {
+    width: 48px; height: 48px;
+    border-radius: 10px;
+    background: var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .pm-info { flex: 1; }
+  .pm-name { font-size: 14px; font-weight: 600; color: var(--ink); }
+  .pm-handle { font-size: 12px; color: var(--ink-muted); margin-top: 2px; }
+  .pm-actions { display: flex; gap: 6px; }
+  .pm-action-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink-muted);
+    cursor: pointer;
+  }
+  .pm-action-btn.danger { border-color: #FECACA; color: #DC2626; }
+  .drag-handle {
+    color: var(--ink-muted);
+    font-size: 14px;
+    cursor: grab;
+    padding: 0 4px;
+  }
+  .add-pm-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: none;
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-muted);
+    cursor: pointer;
+    margin-top: 4px;
+  }
+  /* Add/Edit form modal feel */
+  .pm-form {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+  }
+  .pm-form-title { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 14px; }
+  .pm-field { margin-bottom: 12px; }
+  .pm-field-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 5px; }
+  .pm-field-input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    outline: none;
+  }
+  .pm-field-input.active { border-color: var(--accent); }
+  .qr-upload-zone {
+    width: 100%;
+    height: 72px;
+    background: var(--bg);
+    border: 1.5px dashed var(--border);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px;
+    color: var(--ink-muted);
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .pm-form-btns { display: flex; gap: 8px; margin-top: 4px; }
+  .pm-form-btn {
+    flex: 1;
+    padding: 11px;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: none;
+    color: var(--ink-muted);
+  }
+  .pm-form-btn.save { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .sort-hint {
+    font-size: 11px;
+    color: var(--ink-muted);
+    text-align: center;
+    margin-top: 6px;
+  }
+</style>
+
+<div class="flow-connector">tap ⚙️ settings</div>
+
+<!-- ── SCREEN 5: SETTINGS / PAYMENT METHODS ── -->
+<div class="stage-label">⑤ Settings — Manage Payment Methods</div>
+<div class="phone">
+  <div class="status-bar"><span>9:41</span><div class="notch"></div><span>● ●●</span></div>
+  <div class="screen">
+    <div class="nav-back">← Bills</div>
+    <div style="font-family:'DM Serif Display',serif;font-size:24px;color:var(--ink);margin-bottom:6px;">Payment Methods</div>
+    <div style="font-size:13px;color:var(--ink-muted);margin-bottom:20px;">Shown to people you send bills to. Drag to reorder.</div>
+
+    <!-- Existing methods -->
+    <div class="pm-card">
+      <span class="drag-handle">⠿</span>
+      <div class="pm-qr-thumb">💙</div>
+      <div class="pm-info">
+        <div class="pm-name">GCash</div>
+      </div>
+      <div class="pm-actions">
+        <button class="pm-action-btn">Edit</button>
+        <button class="pm-action-btn danger">✕</button>
+      </div>
+    </div>
+
+    <div class="pm-card">
+      <span class="drag-handle">⠿</span>
+      <div class="pm-qr-thumb">💜</div>
+      <div class="pm-info">
+        <div class="pm-name">Maya</div>
+      </div>
+      <div class="pm-actions">
+        <button class="pm-action-btn">Edit</button>
+        <button class="pm-action-btn danger">✕</button>
+      </div>
+    </div>
+
+    <div class="pm-card">
+      <span class="drag-handle">⠿</span>
+      <div class="pm-qr-thumb">🏦</div>
+      <div class="pm-info">
+        <div class="pm-name">BDO</div>
+      </div>
+      <div class="pm-actions">
+        <button class="pm-action-btn">Edit</button>
+        <button class="pm-action-btn danger">✕</button>
+      </div>
+    </div>
+
+    <div class="sort-hint">↕ Drag to change display order</div>
+
+    <div style="height:16px;"></div>
+
+    <!-- Add new form (expanded state) -->
+    <div class="pm-form">
+      <div class="pm-form-title">＋ Add Payment Method</div>
+      <div class="pm-field">
+        <div class="pm-field-label">Name</div>
+        <input class="pm-field-input active" type="text" placeholder="e.g. GCash, Maya, BDO" value="InstaPay">
+      </div>
+      <div class="pm-field">
+        <div class="pm-field-label">QR Code Image</div>
+        <div class="qr-upload-zone">📷 &nbsp; Upload QR code photo</div>
+      </div>
+      <div class="pm-form-btns">
+        <button class="pm-form-btn">Cancel</button>
+        <button class="pm-form-btn save">Save</button>
+      </div>
+    </div>
+
+    <button class="add-pm-btn" style="border-style:solid;border-color:var(--border);opacity:0.5;">＋ Add another method</button>
+
+  </div>
+</div>
+
+</body>
+</html>
+
