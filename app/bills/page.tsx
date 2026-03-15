@@ -53,18 +53,22 @@ export default async function BillsPage() {
         {activeBills.length > 0 && (
           <>
             <div className="section-label">Active</div>
-            {activeBills.map((bill) => (
-              <BillCard key={bill.id} bill={bill} />
-            ))}
+            <div className="bills-grid">
+              {activeBills.map((bill) => (
+                <BillCard key={bill.id} bill={bill} />
+              ))}
+            </div>
           </>
         )}
 
         {settledBills.length > 0 && (
           <div style={{ marginTop: 20 }}>
             <div className="section-label">Settled</div>
-            {settledBills.map((bill) => (
-              <BillCard key={bill.id} bill={bill} settled />
-            ))}
+            <div className="bills-grid">
+              {settledBills.map((bill) => (
+                <BillCard key={bill.id} bill={bill} settled />
+              ))}
+            </div>
           </div>
         )}
 

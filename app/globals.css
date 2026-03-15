@@ -36,8 +36,26 @@ body {
   padding: 0 20px 40px;
 }
 .page-inner {
-  max-width: 375px;
+  max-width: 480px;
   margin: 0 auto;
+}
+
+@media (min-width: 640px) {
+  .page {
+    padding: 0 40px 60px;
+  }
+  .page-inner {
+    max-width: 600px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .page {
+    padding: 0 60px 80px;
+  }
+  .page-inner {
+    max-width: 720px;
+  }
 }
 
 /* ── NAV ── */
@@ -449,6 +467,23 @@ body {
   align-items: center;
 }
 
+/* ── BILLS GRID ── */
+.bills-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+@media (min-width: 768px) {
+  .bills-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .bills-grid .bill-card {
+    margin-bottom: 0;
+  }
+}
+
 /* ── BILL CARD ── */
 .bill-card {
   background: var(--surface);
@@ -549,10 +584,34 @@ body {
   position: relative;
   overflow: hidden;
 }
+
+@media (min-width: 640px) {
+  .bill-hero {
+    padding: 32px 40px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .bill-hero {
+    padding: 40px 60px;
+  }
+}
 .bill-hero-inner {
-  max-width: 375px;
+  max-width: 480px;
   margin: 0 auto;
   position: relative;
+}
+
+@media (min-width: 640px) {
+  .bill-hero-inner {
+    max-width: 600px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .bill-hero-inner {
+    max-width: 720px;
+  }
 }
 .bill-hero-circle {
   position: absolute;
@@ -696,9 +755,15 @@ body {
   justify-content: center;
   padding: 0 20px;
 }
+
+@media (min-width: 640px) {
+  .login-page {
+    padding: 0 40px;
+  }
+}
 .login-card {
   width: 100%;
-  max-width: 375px;
+  max-width: 420px;
 }
 .login-hero {
   text-align: center;
