@@ -5,6 +5,7 @@ export interface Bill {
   date: string;
   total_amount: number;
   service_charge_pct: number;
+  split_mode: SplitMode;
   receipt_url: string | null;
   is_settled: boolean;
   created_at: string;
@@ -33,7 +34,7 @@ export interface MemberInput {
   amount: number;
 }
 
-export type SplitMode = "equal" | "manual";
+export type SplitMode = "equal" | "manual" | "honesty";
 
 export interface PaymentMethod {
   id: string;
