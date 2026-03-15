@@ -38,7 +38,7 @@ export default function MemberRow({
         placeholder={`Member ${index + 1}`}
         className="member-name-input"
       />
-      {splitMode === "equal" ? (
+      {splitMode === "honesty" ? null : splitMode === "equal" ? (
         <span className="member-amount">{formatCurrency(member.amount)}</span>
       ) : (
         <input

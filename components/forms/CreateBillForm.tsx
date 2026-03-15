@@ -22,7 +22,7 @@ export default function CreateBillForm() {
   const [totalAmount, setTotalAmount] = useState(0);
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
-  const [splitMode, setSplitMode] = useState<SplitMode>("equal");
+  const [splitMode, setSplitMode] = useState<SplitMode>("honesty");
   const [members, setMembers] = useState<MemberInput[]>([newMember(), newMember()]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -60,6 +60,8 @@ export default function CreateBillForm() {
     if (mode === "equal") {
       const shares = calculateEqualSplit(totalAmount, members.length);
       setMembers((prev) => prev.map((m, i) => ({ ...m, amount: shares[i] ?? 0 })));
+    } else if (mode === "honesty") {
+      setMembers((prev) => prev.map((m) => ({ ...m, amount: 0 })));
     }
   }
 
@@ -97,6 +99,7 @@ export default function CreateBillForm() {
       serviceChargePct,
       totalAmount,
       receiptUrl,
+      splitMode,
       members: validMembers.map((m) => ({ name: m.name.trim(), amount: m.amount })),
     });
 
@@ -192,7 +195,7 @@ export default function CreateBillForm() {
         ＋ Add member
       </button>
 
-      <ReconcileRow assigned={totalAssigned} total={totalAmount} />
+      {splitMode !== "honesty" && <ReconcileRow assigned={totalAssigned} total={totalAmount} />}
 
       {error && <p className="field-error">{error}</p>}
 

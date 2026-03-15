@@ -1,7 +1,7 @@
 "use server";
 
 import { supabaseAdmin } from "@/lib/supabase-admin";
-import { MemberInput } from "@/lib/types";
+import { MemberInput, SplitMode } from "@/lib/types";
 
 export async function uploadReceipt(formData: FormData): Promise<{ url: string } | { error: string }> {
   const file = formData.get("file") as File | null;
@@ -30,6 +30,7 @@ interface CreateBillInput {
   serviceChargePct: number;
   totalAmount: number;
   receiptUrl: string | null;
+  splitMode: SplitMode;
   members: Pick<MemberInput, "name" | "amount">[];
 }
 
@@ -42,6 +43,7 @@ export async function createBill(data: CreateBillInput): Promise<{ id: string } 
       date: data.date,
       total_amount: data.totalAmount,
       service_charge_pct: data.serviceChargePct,
+      split_mode: data.splitMode,
       receipt_url: data.receiptUrl,
     })
     .select("id")
