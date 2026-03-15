@@ -111,7 +111,7 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
 
   async function handleCopyAmount() {
     if (!selectedMember) return;
-    const amount = isHonesty && selectedMember.share_amount === 0 ? honestyTotal : selectedMember.share_amount;
+    const amount = isHonesty && !hasClaimed ? honestyTotal : selectedMember.share_amount;
     const rounded = Math.round(amount * 100) / 100;
     await navigator.clipboard.writeText(String(rounded));
     setToastMsg("Amount copied!");
@@ -310,9 +310,9 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
             <>
               <div className="share-card">
                 <p className="share-card-label">Your share</p>
-                <p className="share-amount">{formatCurrency(isHonesty ? honestyTotal : selectedMember.share_amount)}</p>
+                <p className="share-amount">{formatCurrency(isHonesty && !hasClaimed ? honestyTotal : selectedMember.share_amount)}</p>
                 {(() => {
-                  const amount = isHonesty ? honestyTotal : selectedMember.share_amount;
+                  const amount = isHonesty && !hasClaimed ? honestyTotal : selectedMember.share_amount;
                   const { food, sc } = getShareBreakdown(amount, bill.service_charge_pct);
                   return (
                     <p className="share-breakdown">
