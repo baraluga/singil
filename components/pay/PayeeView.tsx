@@ -16,8 +16,16 @@ interface PayeeViewProps {
   paymentMethods: PaymentMethod[];
 }
 
+const STORAGE_KEY = (billId: string) => `singil:claim:${billId}`;
+
 export default function PayeeView({ bill, members, paymentMethods }: PayeeViewProps) {
-  const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
+  const [selectedMemberId, setSelectedMemberId] = useState<string | null>(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY(bill.id));
+      if (stored && members.some((m) => m.id === stored)) return stored;
+    } catch {}
+    return null;
+  });
   const [claiming, setClaiming] = useState(false);
   const [claimedIds, setClaimedIds] = useState<Set<string>>(new Set());
   const [proofFile, setProofFile] = useState<File | null>(null);
@@ -84,6 +92,7 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
         setClaimedIds((prev) => new Set(prev).add(selectedMember.id));
         if (data.proof_url) setProofUrl(data.proof_url);
         setToastMsg("Payment sent!");
+        try { localStorage.setItem(STORAGE_KEY(bill.id), selectedMember.id); } catch {}
       } else {
         const data = await res.json().catch(() => ({}));
         setToastMsg(data.error ?? "Something went wrong. Please try again.");
