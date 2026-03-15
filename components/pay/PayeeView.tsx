@@ -10,6 +10,7 @@ import Toast from "@/components/ui/Toast";
 import PaymentMethodCard from "@/components/pay/PaymentMethodCard";
 import QrModal from "@/components/pay/QrModal";
 import { compressImage } from "@/lib/utils/image";
+import { triggerPaymentCelebration } from "@/lib/utils/celebration";
 
 interface PayeeViewProps {
   bill: Bill;
@@ -43,6 +44,7 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [honestyItems, setHonestyItems] = useState<number[]>([0]);
   const [honestyConfirmed, setHonestyConfirmed] = useState(false);
+  const [popping, setPopping] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -98,6 +100,9 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
         const data = await res.json();
         setClaimedIds((prev) => new Set(prev).add(selectedMember.id));
         if (data.proof_url) setProofUrl(data.proof_url);
+        triggerPaymentCelebration();
+        setPopping(true);
+        setTimeout(() => setPopping(false), 400);
         setToastMsg("Payment sent!");
         try { localStorage.setItem(STORAGE_KEY(bill.id), selectedMember.id); } catch {}
       } else {
@@ -396,7 +401,7 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
                       </button>
                     )}
                     <button
-                      className="btn-claim"
+                      className={`btn-claim${popping ? " pop" : ""}`}
                       onClick={handleClaim}
                       disabled={claiming}
                       style={{ marginTop: 10 }}

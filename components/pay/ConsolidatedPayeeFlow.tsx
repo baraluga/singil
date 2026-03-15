@@ -9,6 +9,7 @@ import Toast from "@/components/ui/Toast";
 import PaymentMethodCard from "@/components/pay/PaymentMethodCard";
 import QrModal from "@/components/pay/QrModal";
 import { compressImage } from "@/lib/utils/image";
+import { triggerPaymentCelebration } from "@/lib/utils/celebration";
 
 interface ConsolidatedPayeeFlowProps {
   unpaidBills: BillWithMembers[];
@@ -45,6 +46,7 @@ export default function ConsolidatedPayeeFlow({
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [proofPreview, setProofPreview] = useState<string | null>(null);
   const [claiming, setClaiming] = useState(false);
+  const [popping, setPopping] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [receiptModal, setReceiptModal] = useState<string | null>(null);
   const [qrModal, setQrModal] = useState<{ name: string; qrUrl: string } | null>(null);
@@ -102,6 +104,9 @@ export default function ConsolidatedPayeeFlow({
       });
 
       if (res.ok) {
+        triggerPaymentCelebration();
+        setPopping(true);
+        setTimeout(() => setPopping(false), 400);
         setToastMsg("Payment sent!");
         onAllClaimed();
       } else {
@@ -350,7 +355,7 @@ export default function ConsolidatedPayeeFlow({
               </button>
             )}
             <button
-              className="btn-claim"
+              className={`btn-claim${popping ? " pop" : ""}`}
               onClick={handleClaim}
               disabled={claiming}
               style={{ marginTop: 10 }}
