@@ -16,23 +16,20 @@ export default function ReceiptUpload({ preview, onChange }: ReceiptUploadProps)
   }
 
   return (
-    <div
-      onClick={() => inputRef.current?.click()}
-      className="w-full h-20 bg-surface border-[1.5px] border-dashed border-border rounded-[10px] flex flex-col items-center justify-center gap-1 text-ink-muted text-xs cursor-pointer hover:border-accent transition-colors"
-    >
+    <div className="receipt-upload" onClick={() => inputRef.current?.click()}>
       <input
         ref={inputRef}
         type="file"
         accept="image/jpeg,image/png,image/webp"
-        className="hidden"
+        style={{ display: "none" }}
         onChange={handleChange}
       />
       {preview ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={preview} alt="Receipt" className="h-full w-full object-cover rounded-[10px]" />
+        <img src={preview} alt="Receipt" />
       ) : (
         <>
-          <span className="text-xl">📷</span>
+          <span className="icon">📷</span>
           <span>Tap to upload receipt</span>
         </>
       )}

@@ -11,13 +11,13 @@ export default async function Home() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center px-5 bg-bg">
-      <div className="w-full max-w-sm">
-        <div className="text-center mb-8">
-          <h1 className="font-serif text-4xl text-ink mb-2">Singil</h1>
-          <p className="text-ink-muted text-sm">Split bills and collect payments easily</p>
+    <main className="login-page">
+      <div className="login-card">
+        <div className="login-hero">
+          <h1 className="login-title">Singil</h1>
+          <p className="login-sub">Split bills and collect payments easily</p>
         </div>
-        <div className="bg-surface border border-border rounded-xl p-6 shadow-md">
+        <div className="login-form-card">
           <LoginForm />
         </div>
       </div>

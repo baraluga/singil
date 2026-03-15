@@ -13,9 +13,5 @@ export default function Toast({ message, onDismiss }: ToastProps) {
     return () => clearTimeout(t);
   }, [onDismiss]);
 
-  return (
-    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-ink text-white text-sm font-medium px-4 py-2.5 rounded-full shadow-lg z-50 whitespace-nowrap">
-      {message}
-    </div>
-  );
+  return <div className="toast">{message}</div>;
 }

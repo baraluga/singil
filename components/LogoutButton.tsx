@@ -11,10 +11,7 @@ export default function LogoutButton() {
   }
 
   return (
-    <button
-      onClick={handleLogout}
-      className="text-xs text-ink-muted hover:text-ink"
-    >
+    <button onClick={handleLogout} className="btn-logout">
       Sign out
     </button>
   );

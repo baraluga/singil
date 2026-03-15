@@ -24,9 +24,10 @@ export default function MemberRow({
   const colors = getAvatarColor(index);
 
   return (
-    <div className="flex items-center gap-2.5 bg-surface border border-border rounded-[10px] px-3 py-2.5">
+    <div className="member-row">
       <div
-        className={`w-[30px] h-[30px] rounded-full flex items-center justify-center shrink-0 text-xs font-bold ${colors.bg} ${colors.text}`}
+        className="member-avatar"
+        style={{ background: colors.bgValue, color: colors.textValue }}
       >
         {getInitial(member.name) || String(index + 1)}
       </div>
@@ -35,24 +36,24 @@ export default function MemberRow({
         value={member.name}
         onChange={(e) => onNameChange(member.tempId, e.target.value)}
         placeholder={`Member ${index + 1}`}
-        className="flex-1 bg-transparent text-sm font-medium text-ink outline-none placeholder-[#BEB5A8]"
+        className="member-name-input"
       />
       {splitMode === "equal" ? (
-        <span className="text-sm font-semibold text-ink">{formatCurrency(member.amount)}</span>
+        <span className="member-amount">{formatCurrency(member.amount)}</span>
       ) : (
         <input
           type="number"
           value={member.amount || ""}
           onChange={(e) => onAmountChange(member.tempId, parseFloat(e.target.value) || 0)}
           placeholder="0"
-          className="w-24 bg-accent-light text-accent text-[13px] font-semibold text-right rounded-[8px] px-2.5 py-1.5 outline-none border-none"
+          className="member-amount-input"
         />
       )}
       {canRemove && (
         <button
           type="button"
           onClick={() => onRemove(member.tempId)}
-          className="text-ink-muted hover:text-[#DC2626] text-sm ml-1"
+          className="member-remove-btn"
         >
           ✕
         </button>

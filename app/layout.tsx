@@ -27,9 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${dmSans.variable} ${dmSerifDisplay.variable} antialiased`}
-      >
+      <body className={`${dmSans.variable} ${dmSerifDisplay.variable}`}>
         {children}
       </body>
     </html>

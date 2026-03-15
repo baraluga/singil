@@ -12,10 +12,7 @@ export default function ReceiptThumbnail({ url }: ReceiptThumbnailProps) {
 
   return (
     <>
-      <button
-        onClick={() => setOpen(true)}
-        className="absolute right-5 top-5 w-12 h-12 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center text-xl cursor-pointer"
-      >
+      <button onClick={() => setOpen(true)} className="receipt-thumb">
         🧾
       </button>
       {open && <Modal src={url} onClose={() => setOpen(false)} />}

@@ -36,17 +36,11 @@ export default function ShareButtons({ billId, billName }: ShareButtonsProps) {
 
   return (
     <>
-      <div className="flex gap-2 mb-5">
-        <button
-          onClick={handleCopy}
-          className="flex-1 flex items-center justify-center gap-1.5 bg-surface border border-border rounded-xl py-3 text-[13px] font-semibold text-ink"
-        >
+      <div className="share-row">
+        <button onClick={handleCopy} className="btn-share">
           🔗 Copy link
         </button>
-        <button
-          onClick={handleShare}
-          className="flex-1 flex items-center justify-center gap-1.5 bg-accent border border-accent rounded-xl py-3 text-[13px] font-semibold text-white"
-        >
+        <button onClick={handleShare} className="btn-share primary">
           Share to group →
         </button>
       </div>

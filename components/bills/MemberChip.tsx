@@ -1,27 +1,15 @@
 import { Member } from "@/lib/types";
 
 interface MemberChipProps {
-  member: Member;
+  member: Pick<Member, "name" | "is_paid" | "claimed_paid">;
 }
 
 export default function MemberChip({ member }: MemberChipProps) {
   if (member.is_paid) {
-    return (
-      <span className="text-[11px] font-medium px-2 py-[3px] rounded-full bg-green-light text-green">
-        ✓ {member.name}
-      </span>
-    );
+    return <span className="member-chip paid">✓ {member.name}</span>;
   }
   if (member.claimed_paid) {
-    return (
-      <span className="text-[11px] font-medium px-2 py-[3px] rounded-full bg-[#FEF3C7] text-[#92400E]">
-        ⚡ {member.name}
-      </span>
-    );
+    return <span className="member-chip claimed">⚡ {member.name}</span>;
   }
-  return (
-    <span className="text-[11px] font-medium px-2 py-[3px] rounded-full bg-bg text-ink-muted border border-border">
-      {member.name}
-    </span>
-  );
+  return <span className="member-chip pending">{member.name}</span>;
 }

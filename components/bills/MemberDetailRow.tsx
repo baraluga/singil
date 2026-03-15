@@ -18,68 +18,47 @@ export default function MemberDetailRow({ member, scPct, index, billId }: Member
   const { food, sc } = getShareBreakdown(member.share_amount, scPct);
 
   return (
-    <div className="mb-2">
-      <div className="bg-surface border border-border rounded-2xl px-4 py-3.5 flex items-center gap-3">
+    <div style={{ marginBottom: 8 }}>
+      <div className="member-detail-row">
         <div
-          className={`w-[30px] h-[30px] rounded-full flex items-center justify-center shrink-0 text-xs font-bold ${colors.bg} ${colors.text}`}
+          className="member-avatar"
+          style={{ background: colors.bgValue, color: colors.textValue }}
         >
           {getInitial(member.name)}
         </div>
-        <div className="flex-1">
-          <div className="text-sm font-semibold text-ink">{member.name}</div>
-          <div className="text-xs text-ink-muted mt-0.5">
+        <div className="member-detail-info">
+          <div className="member-detail-name">{member.name}</div>
+          <div className="member-detail-sub">
             {formatCurrency(food)} + {formatCurrency(sc)} SC
             {member.claimed_paid && !member.is_paid && " · claimed paid"}
           </div>
         </div>
-        <div className="flex flex-col items-end gap-1.5">
-          <div className="font-serif text-[18px] text-ink">{formatCurrency(member.share_amount)}</div>
+        <div className="member-detail-actions">
+          <div className="member-detail-amount">{formatCurrency(member.share_amount)}</div>
           {member.is_paid ? (
-            <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-[3px] rounded-full bg-green-light text-green">
-              ✓ Paid
-            </span>
+            <span className="status-badge paid">✓ Paid</span>
           ) : member.claimed_paid ? (
-            <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-[3px] rounded-full bg-[#FEF3C7] text-[#92400E]">
-              ⚡ Claimed
-            </span>
+            <span className="status-badge claimed">⚡ Claimed</span>
           ) : (
-            <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-[3px] rounded-full bg-bg text-ink-muted border border-border">
-              Pending
-            </span>
+            <span className="status-badge pending">Pending</span>
           )}
         </div>
       </div>
 
-      {/* Action buttons */}
       {!member.is_paid && (
-        <div className="flex gap-2 mt-1 pl-[52px]">
+        <div className="action-row">
           {member.claimed_paid ? (
             <>
               <form action={confirmPaid.bind(null, member.id, billId)}>
-                <button
-                  type="submit"
-                  className="bg-none border border-green rounded-lg px-2.5 py-[5px] text-[11px] font-semibold text-green"
-                >
-                  ✓ Confirm
-                </button>
+                <button type="submit" className="btn-mark confirm">✓ Confirm</button>
               </form>
               <form action={dismissClaim.bind(null, member.id, billId)}>
-                <button
-                  type="submit"
-                  className="bg-none border border-border rounded-lg px-2.5 py-[5px] text-[11px] font-semibold text-ink-muted"
-                >
-                  ✗ Dismiss
-                </button>
+                <button type="submit" className="btn-mark">✗ Dismiss</button>
               </form>
             </>
           ) : (
             <form action={markPaid.bind(null, member.id, billId)}>
-              <button
-                type="submit"
-                className="bg-none border border-green rounded-lg px-2.5 py-[5px] text-[11px] font-semibold text-green"
-              >
-                ✓ Mark paid
-              </button>
+              <button type="submit" className="btn-mark confirm">✓ Mark paid</button>
             </form>
           )}
         </div>

@@ -27,67 +27,48 @@ export default async function BillsPage() {
   const settledBills = billsWithMembers.filter((b) => b.is_settled);
 
   return (
-    <main className="min-h-screen bg-bg px-5 pb-10">
-      <div className="max-w-sm mx-auto">
-        {/* Header */}
-        <div className="flex justify-between items-start pt-5 pb-7">
+    <main className="page">
+      <div className="page-inner">
+        <div className="dash-header">
           <div>
-            <h1 className="font-serif text-[28px] text-ink leading-tight">Singil</h1>
-            <p className="text-[13px] text-ink-muted mt-0.5">
+            <h1 className="dash-title">Singil</h1>
+            <p className="dash-sub">
               {activeBills.length} active · {settledBills.length} settled
             </p>
           </div>
-          <div className="flex gap-2 items-center">
-            <Link
-              href="/settings"
-              className="bg-surface text-ink border border-border rounded-xl px-3 py-2.5 text-[13px] font-semibold"
-            >
-              ⚙️
-            </Link>
-            <Link
-              href="/bills/new"
-              className="bg-accent text-white rounded-xl px-4 py-2.5 text-[13px] font-semibold whitespace-nowrap"
-            >
-              ＋ New bill
-            </Link>
+          <div className="dash-actions">
+            <Link href="/settings" className="btn-settings">⚙️</Link>
+            <Link href="/bills/new" className="btn-new">＋ New bill</Link>
           </div>
         </div>
 
-        {/* Empty state */}
         {billsWithMembers.length === 0 && (
-          <div className="text-center py-16">
-            <div className="text-4xl mb-3">🧾</div>
-            <p className="text-ink font-medium mb-1">No bills yet</p>
-            <p className="text-ink-muted text-sm">Create your first bill to get started</p>
+          <div className="empty-state">
+            <div className="empty-state-icon">🧾</div>
+            <p className="empty-state-title">No bills yet</p>
+            <p className="empty-state-sub">Create your first bill to get started</p>
           </div>
         )}
 
-        {/* Active bills */}
         {activeBills.length > 0 && (
           <>
-            <div className="text-[11px] font-semibold tracking-widest uppercase text-ink-muted mb-2.5">
-              Active
-            </div>
+            <div className="section-label">Active</div>
             {activeBills.map((bill) => (
               <BillCard key={bill.id} bill={bill} />
             ))}
           </>
         )}
 
-        {/* Settled bills */}
         {settledBills.length > 0 && (
-          <div className="mt-5">
-            <div className="text-[11px] font-semibold tracking-widest uppercase text-ink-muted mb-2.5">
-              Settled
-            </div>
+          <div style={{ marginTop: 20 }}>
+            <div className="section-label">Settled</div>
             {settledBills.map((bill) => (
               <BillCard key={bill.id} bill={bill} settled />
             ))}
           </div>
         )}
 
-        {/* Footer */}
-        <div className="text-center mt-8">
+        <div style={{ textAlign: "center", marginTop: 32 }}>
           <LogoutButton />
         </div>
       </div>

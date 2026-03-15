@@ -34,41 +34,30 @@ export default async function BillDetailPage({ params }: { params: Promise<{ id:
   });
 
   return (
-    <main className="min-h-screen bg-bg pb-10">
-      <div className="max-w-sm mx-auto px-5">
-        <Link
-          href="/bills"
-          className="flex items-center gap-1.5 text-accent text-sm font-medium pt-5 mb-0"
-        >
-          ← Bills
-        </Link>
+    <main style={{ minHeight: "100vh", background: "var(--bg)", paddingBottom: 40 }}>
+      <div className="page-inner" style={{ padding: "0 20px" }}>
+        <Link href="/bills" className="nav-back">← Bills</Link>
       </div>
 
-      {/* Dark hero header */}
-      <div className="bg-ink relative overflow-hidden mx-0 px-5 py-5 mb-5">
-        <div className="max-w-sm mx-auto relative">
+      <div className="bill-hero">
+        <div className="bill-hero-inner" style={{ padding: "0 20px" }}>
+          <div className="bill-hero-circle" />
           {bill.receipt_url && <ReceiptThumbnail url={bill.receipt_url} />}
-          {/* Decorative circle */}
-          <div className="absolute -right-8 -top-8 w-[120px] h-[120px] rounded-full bg-accent/15 pointer-events-none" />
-          <h1 className="font-serif text-[22px] text-white">{bill.name}</h1>
-          <p className="text-xs text-white/50 mt-1">
+          <h1 className="bill-hero-name">{bill.name}</h1>
+          <p className="bill-hero-meta">
             {date} · {memberList.length} {memberList.length === 1 ? "member" : "members"} · SC {bill.service_charge_pct}%
           </p>
-          <p className="font-serif text-[36px] text-white mt-2.5">
+          <p className="bill-hero-total">
             {formatCurrency(bill.total_amount)}{" "}
-            <span className="font-sans text-[13px] text-white/50">total</span>
+            <span>total</span>
           </p>
         </div>
       </div>
 
-      <div className="max-w-sm mx-auto px-5">
-        {/* Share buttons (BAR-35) */}
+      <div className="page-inner" style={{ padding: "0 20px" }}>
         <ShareButtons billId={bill.id} billName={bill.name} />
 
-        {/* Members section */}
-        <div className="text-[11px] font-semibold tracking-widest uppercase text-ink-muted mb-3">
-          Members
-        </div>
+        <div className="section-label">Members</div>
 
         {memberList.map((member, i) => (
           <MemberDetailRow
@@ -80,12 +69,9 @@ export default async function BillDetailPage({ params }: { params: Promise<{ id:
           />
         ))}
 
-        {/* Settle button when all paid */}
         {allPaid && !bill.is_settled && <SettleButton billId={bill.id} />}
         {bill.is_settled && (
-          <div className="mt-4 text-center py-3 text-green font-semibold text-sm">
-            ✓ This bill is settled
-          </div>
+          <div className="settled-notice">✓ This bill is settled</div>
         )}
       </div>
     </main>

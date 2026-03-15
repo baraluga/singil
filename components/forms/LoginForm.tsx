@@ -30,26 +30,24 @@ export default function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full">
-      <div className="mb-4">
-        <label className="block text-[11px] font-semibold tracking-[0.08em] uppercase text-ink-muted mb-1.5">
-          Password
-        </label>
+    <form onSubmit={handleSubmit}>
+      <div className="field-group">
+        <label className="field-label">Password</label>
         <input
           type="password"
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="••••••••"
-          className="w-full bg-surface border border-border rounded-[10px] px-3.5 py-3 text-sm text-ink placeholder-[#BEB5A8] outline-none focus:border-accent"
+          className="field-input"
           autoFocus
         />
       </div>
-      {error && <p className="text-[#DC2626] text-xs mb-3">{error}</p>}
+      {error && <p className="field-error">{error}</p>}
       <button
         type="submit"
         disabled={isLoading || !password}
-        className="w-full bg-accent text-white rounded-[14px] py-4 text-[15px] font-semibold disabled:opacity-50"
+        className="btn-primary"
       >
         {isLoading ? "Signing in…" : "Sign in"}
       </button>

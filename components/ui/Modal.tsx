@@ -18,17 +18,28 @@ export default function Modal({ src, onClose }: ModalProps) {
 
   return (
     <div
-      className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-6"
       onClick={onClose}
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,0.7)",
+        zIndex: 50,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 24,
+      }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}
         alt="Receipt"
-        className="max-w-full max-h-full rounded-xl object-contain"
         onClick={(e) => e.stopPropagation()}
+        style={{ maxWidth: "100%", maxHeight: "100%", borderRadius: 12, objectFit: "contain" }}
       />
-      <div className="absolute bottom-6 text-white/40 text-xs">Tap anywhere to dismiss</div>
+      <div style={{ position: "absolute", bottom: 24, color: "rgba(255,255,255,0.4)", fontSize: 12 }}>
+        Tap anywhere to dismiss
+      </div>
     </div>
   );
 }
