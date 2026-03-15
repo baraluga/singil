@@ -14,6 +14,7 @@ export default async function Home() {
     <main className="login-page">
       <div className="login-card">
         <div className="login-hero">
+          <div className="login-icon">₱</div>
           <h1 className="login-title">Singil</h1>
           <p className="login-sub">Split bills and collect payments easily</p>
         </div>
