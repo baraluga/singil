@@ -18,6 +18,15 @@ const dmSerifDisplay = DM_Serif_Display({
 export const metadata: Metadata = {
   title: "Singil",
   description: "Split bills and collect payments easily",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Singil",
+  },
+  other: {
+    "theme-color": "#1A1612",
+  },
 };
 
 export default function RootLayout({

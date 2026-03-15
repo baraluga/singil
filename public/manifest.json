@@ -1,0 +1,8 @@
+{
+  "name": "Singil",
+  "short_name": "Singil",
+  "start_url": "/bills",
+  "display": "standalone",
+  "theme_color": "#1A1612",
+  "background_color": "#F5F0E8"
+}

@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { Member } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils/currency";
 import { getShareBreakdown } from "@/lib/utils/split";
 import { getAvatarColor, getInitial } from "@/lib/utils/avatars";
 import { confirmPaid, dismissClaim, markPaid } from "@/lib/actions/members";
 import Modal from "@/components/ui/Modal";
+import Toast from "@/components/ui/Toast";
 
 interface MemberDetailRowProps {
   member: Member;
@@ -19,6 +20,15 @@ export default function MemberDetailRow({ member, scPct, index, billId }: Member
   const colors = getAvatarColor(index);
   const { food, sc } = getShareBreakdown(member.share_amount, scPct);
   const [proofOpen, setProofOpen] = useState(false);
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+
+  function runAction(action: () => Promise<void>, successMsg: string) {
+    startTransition(async () => {
+      await action();
+      setToastMsg(successMsg);
+    });
+  }
 
   return (
     <div style={{ marginBottom: 8 }}>
@@ -52,12 +62,20 @@ export default function MemberDetailRow({ member, scPct, index, billId }: Member
         <div className="action-row">
           {member.claimed_paid ? (
             <>
-              <form action={confirmPaid.bind(null, member.id, billId)}>
-                <button type="submit" className="btn-mark confirm">✓ Confirm</button>
-              </form>
-              <form action={dismissClaim.bind(null, member.id, billId)}>
-                <button type="submit" className="btn-mark">✗ Dismiss</button>
-              </form>
+              <button
+                className="btn-mark confirm"
+                disabled={isPending}
+                onClick={() => runAction(() => confirmPaid(member.id, billId), "Payment confirmed!")}
+              >
+                ✓ Confirm
+              </button>
+              <button
+                className="btn-mark"
+                disabled={isPending}
+                onClick={() => runAction(() => dismissClaim(member.id, billId), "Claim dismissed")}
+              >
+                ✗ Dismiss
+              </button>
               {member.proof_url && (
                 <button className="btn-mark" onClick={() => setProofOpen(true)}>
                   🧾 View proof
@@ -65,9 +83,13 @@ export default function MemberDetailRow({ member, scPct, index, billId }: Member
               )}
             </>
           ) : (
-            <form action={markPaid.bind(null, member.id, billId)}>
-              <button type="submit" className="btn-mark confirm">✓ Mark paid</button>
-            </form>
+            <button
+              className="btn-mark confirm"
+              disabled={isPending}
+              onClick={() => runAction(() => markPaid(member.id, billId), "Marked as paid!")}
+            >
+              ✓ Mark paid
+            </button>
           )}
         </div>
       )}
@@ -75,6 +97,7 @@ export default function MemberDetailRow({ member, scPct, index, billId }: Member
       {proofOpen && member.proof_url && (
         <Modal src={member.proof_url} onClose={() => setProofOpen(false)} />
       )}
+      {toastMsg && <Toast message={toastMsg} onDismiss={() => setToastMsg(null)} />}
     </div>
   );
 }

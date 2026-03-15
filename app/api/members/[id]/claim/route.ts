@@ -57,10 +57,14 @@ export async function POST(
     }
   }
 
-  await supabaseAdmin
+  const { error: updateError } = await supabaseAdmin
     .from("members")
     .update({ claimed_paid: true, ...(proof_url ? { proof_url } : {}) })
     .eq("id", id);
+
+  if (updateError) {
+    return NextResponse.json({ error: updateError.message }, { status: 500 });
+  }
 
   return NextResponse.json({ ok: true, proof_url });
 }

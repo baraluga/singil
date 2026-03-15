@@ -67,7 +67,12 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
         const data = await res.json();
         setClaimedIds((prev) => new Set(prev).add(selectedMember.id));
         if (data.proof_url) setProofUrl(data.proof_url);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setToastMsg(data.error ?? "Something went wrong. Please try again.");
       }
+    } catch {
+      setToastMsg("Network error. Please check your connection.");
     } finally {
       setClaiming(false);
     }
@@ -83,6 +88,25 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
     ? selectedMember.claimed_paid || claimedIds.has(selectedMember.id)
     : false;
   const claimProofUrl = proofUrl || selectedMember?.proof_url || null;
+
+  if (bill.is_settled) {
+    return (
+      <main className="pay-page">
+        <div className="pay-header">
+          <p className="pay-header-sub">Brian is collecting for</p>
+          <h1 className="pay-header-title">{bill.name}</h1>
+          <p className="pay-header-date">{date}</p>
+        </div>
+        <div className="pay-inner" style={{ textAlign: "center", paddingTop: 48 }}>
+          <div style={{ fontSize: 36, marginBottom: 12 }}>✓</div>
+          <p style={{ fontWeight: 600, fontSize: 16, color: "var(--green)" }}>This bill is settled</p>
+          <p style={{ fontSize: 13, color: "var(--ink-muted)", marginTop: 6 }}>
+            All payments have been confirmed by the organizer.
+          </p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="pay-page">
