@@ -53,7 +53,7 @@ export default async function BillDetailPage({ params }: { params: Promise<{ id:
             <EditableBillName billId={bill.id} name={bill.name} />
           )}
           <p className="bill-hero-meta">
-            {date} · {memberList.length} {memberList.length === 1 ? "member" : "members"} · SC {bill.service_charge_pct}%
+            {date} · {memberList.length} {memberList.length === 1 ? "member" : "members"} · SC {bill.service_charge_pct > 0 ? `≈${bill.service_charge_pct}%` : "none"}
           </p>
           <p className="bill-hero-total">
             {formatCurrency(bill.total_amount)}{" "}

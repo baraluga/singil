@@ -18,7 +18,7 @@ export default function CreateBillForm() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-  const [serviceChargePct, setServiceChargePct] = useState(0);
+  const [serviceChargeAmount, setServiceChargeAmount] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0);
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
@@ -63,6 +63,11 @@ export default function CreateBillForm() {
 
   const totalAssigned = members.reduce((sum, m) => sum + m.amount, 0);
 
+  const computedScPct =
+    serviceChargeAmount > 0 && totalAmount > serviceChargeAmount
+      ? (serviceChargeAmount / (totalAmount - serviceChargeAmount)) * 100
+      : 0;
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
@@ -89,7 +94,7 @@ export default function CreateBillForm() {
     const result = await createBill({
       name: name.trim(),
       date,
-      serviceChargePct,
+      serviceChargePct: computedScPct,
       totalAmount,
       receiptUrl,
       splitMode,
@@ -130,18 +135,21 @@ export default function CreateBillForm() {
         </div>
         <div className="field-group" style={{ marginBottom: 0 }}>
           <label className="field-label">Service Charge</label>
-          <div className="field-input-suffix">
+          <div className="field-input-prefix">
+            <span className="prefix">₱</span>
             <input
               type="number"
               min="0"
-              max="100"
-              value={serviceChargePct || ""}
-              onChange={(e) => setServiceChargePct(parseFloat(e.target.value) || 0)}
-              placeholder="0"
+              step="0.01"
+              value={serviceChargeAmount || ""}
+              onChange={(e) => setServiceChargeAmount(parseFloat(e.target.value) || 0)}
+              placeholder="0.00"
               className="field-input"
             />
-            <span className="suffix">%</span>
           </div>
+          {computedScPct > 0 && (
+            <p className="field-hint">≈ {computedScPct.toFixed(2)}% of subtotal</p>
+          )}
         </div>
       </div>
 
