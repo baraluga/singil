@@ -16,7 +16,7 @@ const dmSerifDisplay = DM_Serif_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Singil",
+  title: "Singil — Split bills, collect payments",
   description: "Split bills and collect payments easily",
   manifest: "/manifest.json",
   appleWebApp: {
