@@ -26,6 +26,8 @@ export default async function BillDetailPage({ params }: { params: Promise<{ id:
 
   const memberList = members ?? [];
   const allPaid = memberList.length > 0 && memberList.every((m) => m.is_paid);
+  const collected = memberList.reduce((sum, m) => sum + (m.share_amount > 0 ? m.share_amount : 0), 0);
+  const myShare = bill.total_amount - collected;
 
   const date = new Date(bill.date).toLocaleDateString("en-PH", {
     month: "long",
@@ -51,6 +53,12 @@ export default async function BillDetailPage({ params }: { params: Promise<{ id:
             {formatCurrency(bill.total_amount)}{" "}
             <span>total</span>
           </p>
+          {myShare > 0 && (
+            <p className="bill-hero-my-share">
+              {formatCurrency(myShare)}{" "}
+              <span>your share</span>
+            </p>
+          )}
         </div>
       </div>
 
