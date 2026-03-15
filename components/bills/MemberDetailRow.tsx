@@ -18,6 +18,7 @@ interface MemberDetailRowProps {
 
 export default function MemberDetailRow({ member, scPct, index, billId }: MemberDetailRowProps) {
   const colors = getAvatarColor(index);
+  const hasAmount = member.share_amount > 0;
   const { food, sc } = getShareBreakdown(member.share_amount, scPct);
   const [proofOpen, setProofOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
@@ -42,12 +43,17 @@ export default function MemberDetailRow({ member, scPct, index, billId }: Member
         <div className="member-detail-info">
           <div className="member-detail-name">{member.name}</div>
           <div className="member-detail-sub">
-            {formatCurrency(food)} + {formatCurrency(sc)} SC
-            {member.claimed_paid && !member.is_paid && " · claimed paid"}
+            {hasAmount ? (
+              <>{formatCurrency(food)} + {formatCurrency(sc)} SC{member.claimed_paid && !member.is_paid && " · claimed paid"}</>
+            ) : (
+              member.claimed_paid ? "Claimed — awaiting amount" : "Awaiting claim"
+            )}
           </div>
         </div>
         <div className="member-detail-actions">
-          <div className="member-detail-amount">{formatCurrency(member.share_amount)}</div>
+          <div className="member-detail-amount" style={!hasAmount ? { color: "var(--ink-muted)" } : undefined}>
+            {hasAmount ? formatCurrency(member.share_amount) : "—"}
+          </div>
           {member.is_paid ? (
             <span className="status-badge paid">✓ Paid</span>
           ) : member.claimed_paid ? (
