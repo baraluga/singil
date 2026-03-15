@@ -28,6 +28,7 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
   const [qrModal, setQrModal] = useState<{ name: string; qrUrl: string } | null>(null);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [honestyItems, setHonestyItems] = useState<number[]>([0]);
+  const [honestyConfirmed, setHonestyConfirmed] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isHonesty = bill.split_mode === "honesty";
@@ -116,6 +117,9 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
     );
   }
 
+  // Whether to show payment methods + claim CTA
+  const showPaymentSection = !isHonesty || hasClaimed || honestyConfirmed;
+
   return (
     <main className="pay-page">
       <div className="pay-header">
@@ -157,7 +161,7 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
             ← Oops, wrong person!
           </button>
 
-          {/* Honesty mode: inline receipt + amount input */}
+          {/* Honesty mode: two-step — item entry then review */}
           {isHonesty && !hasClaimed ? (
             <>
               {bill.receipt_url && (
@@ -171,51 +175,93 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
                   <span className="honesty-receipt-overlay">🔍 Tap to expand</span>
                 </button>
               )}
-              <div className="share-card">
-                <p className="share-card-label">Your items</p>
-                <div className="honesty-items-list">
-                  {honestyItems.map((val, idx) => (
-                    <div key={idx} className="honesty-item-row">
-                      <div className="field-input-prefix" style={{ flex: 1 }}>
-                        <span className="prefix">₱</span>
-                        <input
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          value={val || ""}
-                          onChange={(e) => {
-                            const updated = [...honestyItems];
-                            updated[idx] = parseFloat(e.target.value) || 0;
-                            setHonestyItems(updated);
-                          }}
-                          placeholder="0.00"
-                          className="field-input"
-                          // eslint-disable-next-line jsx-a11y/no-autofocus
-                          autoFocus={idx === 0}
-                        />
+
+              {!honestyConfirmed ? (
+                /* Step 1: item entry */
+                <div className="share-card">
+                  <p className="share-card-label">Your items</p>
+                  <div className="honesty-items-list">
+                    {honestyItems.map((val, idx) => (
+                      <div key={idx} className="honesty-item-row">
+                        <div className="field-input-prefix" style={{ flex: 1 }}>
+                          <span className="prefix">₱</span>
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={val || ""}
+                            onChange={(e) => {
+                              const updated = [...honestyItems];
+                              updated[idx] = parseFloat(e.target.value) || 0;
+                              setHonestyItems(updated);
+                            }}
+                            placeholder="0.00"
+                            className="field-input"
+                            // eslint-disable-next-line jsx-a11y/no-autofocus
+                            autoFocus={idx === 0}
+                          />
+                        </div>
+                        {honestyItems.length > 1 && (
+                          <button
+                            type="button"
+                            className="honesty-item-remove"
+                            onClick={() => setHonestyItems(honestyItems.filter((_, i) => i !== idx))}
+                            aria-label="Remove item"
+                          >
+                            ✕
+                          </button>
+                        )}
                       </div>
-                      {honestyItems.length > 1 && (
-                        <button
-                          type="button"
-                          className="honesty-item-remove"
-                          onClick={() => setHonestyItems(honestyItems.filter((_, i) => i !== idx))}
-                          aria-label="Remove item"
-                        >
-                          ✕
-                        </button>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    className="honesty-add-item-btn"
+                    onClick={() => setHonestyItems([...honestyItems, 0])}
+                  >
+                    + Add item
+                  </button>
+                  {honestyAmount > 0 && (
+                    <div className="honesty-summary">
+                      <div className="honesty-summary-row">
+                        <span>Subtotal</span>
+                        <span>{formatCurrency(honestyAmount)}</span>
+                      </div>
+                      {bill.service_charge_pct > 0 && (
+                        <div className="honesty-summary-row sc">
+                          <span>SC ({bill.service_charge_pct}%)</span>
+                          <span>+{formatCurrency(honestyScAmount)}</span>
+                        </div>
                       )}
+                      <div className="honesty-summary-row total">
+                        <span>Total</span>
+                        <span>{formatCurrency(honestyTotal)}</span>
+                      </div>
                     </div>
-                  ))}
+                  )}
+                  <button
+                    type="button"
+                    className="btn-primary"
+                    disabled={honestyAmount <= 0}
+                    onClick={() => setHonestyConfirmed(true)}
+                    style={{ marginTop: 16 }}
+                  >
+                    Confirm items →
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  className="honesty-add-item-btn"
-                  onClick={() => setHonestyItems([...honestyItems, 0])}
-                >
-                  + Add item
-                </button>
-                {honestyAmount > 0 && (
-                  <div className="honesty-summary">
+              ) : (
+                /* Step 2: review summary */
+                <div className="share-card">
+                  <button
+                    className="pay-back-btn"
+                    style={{ marginBottom: 12 }}
+                    onClick={() => setHonestyConfirmed(false)}
+                  >
+                    ← Edit items
+                  </button>
+                  <p className="share-card-label">Your total</p>
+                  <p className="share-amount">{formatCurrency(honestyTotal)}</p>
+                  <div className="honesty-summary" style={{ marginBottom: 12 }}>
                     <div className="honesty-summary-row">
                       <span>Subtotal</span>
                       <span>{formatCurrency(honestyAmount)}</span>
@@ -226,15 +272,15 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
                         <span>+{formatCurrency(honestyScAmount)}</span>
                       </div>
                     )}
-                    <div className="honesty-summary-row total">
-                      <span>Total</span>
-                      <span>{formatCurrency(honestyTotal)}</span>
-                    </div>
                   </div>
-                )}
-              </div>
+                  <button className="share-copy-btn" onClick={handleCopyAmount}>
+                    Copy amount
+                  </button>
+                </div>
+              )}
             </>
           ) : (
+            /* Equal / manual mode, or post-claim honesty */
             <>
               <div className="share-card">
                 <p className="share-card-label">Your share</p>
@@ -253,7 +299,6 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
                 </button>
               </div>
 
-              {/* Receipt link — shown for non-honesty or after claiming */}
               {bill.receipt_url && (
                 <button className="receipt-link-btn" onClick={() => setReceiptOpen(true)}>
                   🧾 View receipt
@@ -262,77 +307,79 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
             </>
           )}
 
-          {/* Payment methods */}
-          <p className="section-label" style={{ marginTop: 20 }}>Pay via</p>
-          {paymentMethods.length === 0 ? (
-            <p className="pay-empty-methods">No payment methods set up yet. Ask Brian directly.</p>
-          ) : (
-            paymentMethods.map((pm) => (
-              <PaymentMethodCard
-                key={pm.id}
-                method={pm}
-                onTap={pm.qr_url ? () => setQrModal({ name: pm.name, qrUrl: pm.qr_url! }) : undefined}
-              />
-            ))
-          )}
+          {/* Payment methods + CTA — hidden during honesty item entry step */}
+          {showPaymentSection && (
+            <>
+              <p className="section-label" style={{ marginTop: 20 }}>Pay via</p>
+              {paymentMethods.length === 0 ? (
+                <p className="pay-empty-methods">No payment methods set up yet. Ask Brian directly.</p>
+              ) : (
+                paymentMethods.map((pm) => (
+                  <PaymentMethodCard
+                    key={pm.id}
+                    method={pm}
+                    onTap={pm.qr_url ? () => setQrModal({ name: pm.name, qrUrl: pm.qr_url! }) : undefined}
+                  />
+                ))
+              )}
 
-          {/* CTA */}
-          <div style={{ marginTop: 24 }}>
-            {selectedMember.is_paid ? (
-              <button className="btn-claim confirmed" disabled>
-                ✓ Already confirmed
-              </button>
-            ) : hasClaimed ? (
-              <>
-                <button className="btn-claim waiting" disabled>
-                  ⏳ Waiting for confirmation
-                </button>
-                {claimProofUrl && (
-                  <button className="proof-thumb-btn" onClick={() => setProofOpen(true)}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={claimProofUrl} alt="Payment proof" />
-                    <span>View proof</span>
+              <div style={{ marginTop: 24 }}>
+                {selectedMember.is_paid ? (
+                  <button className="btn-claim confirmed" disabled>
+                    ✓ Already confirmed
                   </button>
-                )}
-              </>
-            ) : (
-              <>
-                {/* Proof upload */}
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  style={{ display: "none" }}
-                  onChange={handleProofSelect}
-                />
-                {proofPreview ? (
-                  <button
-                    className="proof-attach-btn has-proof"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={proofPreview} alt="Proof preview" className="proof-preview-thumb" />
-                    <span>Change proof</span>
-                  </button>
+                ) : hasClaimed ? (
+                  <>
+                    <button className="btn-claim waiting" disabled>
+                      ⏳ Waiting for confirmation
+                    </button>
+                    {claimProofUrl && (
+                      <button className="proof-thumb-btn" onClick={() => setProofOpen(true)}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={claimProofUrl} alt="Payment proof" />
+                        <span>View proof</span>
+                      </button>
+                    )}
+                  </>
                 ) : (
-                  <button
-                    className="proof-attach-btn"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    📎 Attach payment proof (optional)
-                  </button>
+                  <>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      style={{ display: "none" }}
+                      onChange={handleProofSelect}
+                    />
+                    {proofPreview ? (
+                      <button
+                        className="proof-attach-btn has-proof"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={proofPreview} alt="Proof preview" className="proof-preview-thumb" />
+                        <span>Change proof</span>
+                      </button>
+                    ) : (
+                      <button
+                        className="proof-attach-btn"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        📎 Attach payment proof (optional)
+                      </button>
+                    )}
+                    <button
+                      className="btn-claim"
+                      onClick={handleClaim}
+                      disabled={claiming}
+                      style={{ marginTop: 10 }}
+                    >
+                      {claiming ? "Sending..." : "Bayad na ako!"}
+                    </button>
+                  </>
                 )}
-                <button
-                  className="btn-claim"
-                  onClick={handleClaim}
-                  disabled={claiming || (isHonesty && honestyAmount <= 0)}
-                  style={{ marginTop: 10 }}
-                >
-                  {claiming ? "Sending..." : "Bayad na ako!"}
-                </button>
-              </>
-            )}
-          </div>
+              </div>
+            </>
+          )}
         </div>
       ) : null}
 
