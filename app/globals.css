@@ -1372,6 +1372,291 @@ body {
   text-align: center;
 }
 
+/* ── BILLS TABS ── */
+.bills-tab-bar {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 4px;
+}
+.bills-tab {
+  flex: 1;
+  background: none;
+  border: none;
+  border-radius: 9px;
+  padding: 8px 4px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+.bills-tab.active {
+  background: var(--bg);
+  color: var(--ink);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+.bills-tab-count {
+  background: var(--border);
+  border-radius: 10px;
+  padding: 1px 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.bills-tab.active .bills-tab-count {
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+/* ── COLLECTION CARD ── */
+.collection-card {
+  display: block;
+  text-decoration: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  color: var(--ink);
+}
+.collection-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+.collection-card-name {
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 2px;
+}
+.collection-card-meta {
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+.collection-card-amount {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  color: var(--ink);
+}
+.collection-card-progress {
+  margin-top: 8px;
+}
+
+/* ── COLLECTION BILL CARD (payee expandable) ── */
+.collection-bill-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 10px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.collection-bill-card.expanded {
+  border-color: var(--accent);
+}
+.collection-bill-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 14px 16px;
+  cursor: pointer;
+  text-align: left;
+  gap: 8px;
+}
+.collection-bill-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+.collection-bill-card-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.collection-bill-card-date {
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+.collection-bill-card-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.collection-bill-card-amount {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.collection-bill-card-chevron {
+  font-size: 10px;
+  color: var(--ink-muted);
+}
+.collection-bill-card-body {
+  padding: 0 16px 16px;
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+}
+
+/* ── BILL STATUS CHIPS ── */
+.bill-status-chip {
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 3px 8px;
+  white-space: nowrap;
+}
+.bill-status-chip.paid {
+  background: var(--green-light);
+  color: var(--green);
+}
+.bill-status-chip.claimed {
+  background: #FEF3C7;
+  color: #92400E;
+}
+.bill-status-chip.pending {
+  background: var(--border);
+  color: var(--ink-muted);
+}
+
+/* ── COLLECTION PAYEE SUMMARY ── */
+.collection-summary {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-sm);
+}
+.collection-summary-text {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+.collection-summary-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.collection-summary-stat {
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+.collection-summary-bar {
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.collection-summary-fill {
+  height: 100%;
+  background: var(--green);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+.collection-bills-list {
+  margin-bottom: 16px;
+}
+
+/* ── COLLECTION BADGE (name grid) ── */
+.collection-badge {
+  font-size: 10px;
+  font-weight: 600;
+  background: var(--border);
+  color: var(--ink-muted);
+  border-radius: 8px;
+  padding: 2px 6px;
+  margin-top: 2px;
+}
+
+/* ── DIMMED SECTION ── */
+.dimmed-section {
+  opacity: 0.5;
+  margin-top: 24px;
+}
+.dimmed-bill-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--ink-muted);
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── BILL SELECTOR ── */
+.bill-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.bill-selector-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+}
+.bill-selector-item.selected {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+.bill-selector-check {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+  color: var(--accent);
+}
+.bill-selector-item.selected .bill-selector-check {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.bill-selector-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.bill-selector-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.bill-selector-meta {
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
 /* ── TOAST ── */
 .toast {
   position: fixed;
