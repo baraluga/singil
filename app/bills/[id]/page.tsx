@@ -26,7 +26,6 @@ export default async function BillDetailPage({ params }: { params: Promise<{ id:
     .order("created_at", { ascending: true });
 
   const memberList = members ?? [];
-  const allPaid = memberList.length > 0 && memberList.every((m) => m.is_paid);
   const collected = memberList.reduce((sum, m) => sum + (m.share_amount > 0 ? m.share_amount : 0), 0);
   const myShare = bill.total_amount - collected;
 
@@ -82,7 +81,7 @@ export default async function BillDetailPage({ params }: { params: Promise<{ id:
           />
         ))}
 
-        {allPaid && !bill.is_settled && <SettleButton billId={bill.id} />}
+        {!bill.is_settled && <SettleButton billId={bill.id} />}
         {bill.is_settled && (
           <div className="settled-notice">✓ This bill is settled</div>
         )}

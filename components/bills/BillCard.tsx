@@ -12,8 +12,10 @@ interface BillCardProps {
 export default function BillCard({ bill, settled = false }: BillCardProps) {
   const paidCount = bill.members.filter((m) => m.is_paid).length;
   const totalCount = bill.members.length;
-  const collected = bill.members.reduce((sum, m) => sum + (m.share_amount > 0 ? m.share_amount : 0), 0);
-  const remaining = bill.total_amount - collected;
+  const unpaid = bill.members.reduce((sum, m) => {
+    if (m.is_paid) return sum;
+    return sum + (m.share_amount > 0 ? m.share_amount : 0);
+  }, 0);
 
   const date = new Date(bill.date).toLocaleDateString("en-PH", {
     month: "short",
@@ -44,7 +46,7 @@ export default function BillCard({ bill, settled = false }: BillCardProps) {
           <ProgressBar paid={paidCount} total={totalCount} />
           <div className="progress-label">
             <span>{paidCount} of {totalCount} paid</span>
-            <span>{formatCurrency(remaining)} remaining</span>
+            {unpaid > 0 && <span>{formatCurrency(unpaid)} unpaid</span>}
           </div>
           <div className="members-row">
             {bill.members.map((m) => (

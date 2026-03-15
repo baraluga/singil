@@ -1116,7 +1116,7 @@ body {
 /* ── NAME PICKER ── */
 .name-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   gap: 10px;
   margin-bottom: 16px;
 }
@@ -1192,6 +1192,14 @@ body {
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.share-copy-btn:hover {
+  background: var(--accent);
+  color: #fff;
+}
+.share-copy-btn:active {
+  transform: scale(0.95);
 }
 
 /* ── HONESTY MODE ── */
@@ -1332,7 +1340,6 @@ body {
 }
 .payment-card.no-qr {
   cursor: default;
-  opacity: 0.7;
 }
 .payment-card-info {
   flex: 1;
@@ -1731,7 +1738,12 @@ body {
 }
 
 /* ── TOAST ── */
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
 .toast {
+  animation: toast-in 0.2s ease;
   position: fixed;
   bottom: 24px;
   left: 50%;
