@@ -12,7 +12,7 @@ interface BillCardProps {
 export default function BillCard({ bill, settled = false }: BillCardProps) {
   const paidCount = bill.members.filter((m) => m.is_paid).length;
   const totalCount = bill.members.length;
-  const collected = bill.members.reduce((sum, m) => sum + m.share_amount, 0);
+  const collected = bill.members.reduce((sum, m) => sum + (m.share_amount > 0 ? m.share_amount : 0), 0);
   const remaining = bill.total_amount - collected;
 
   const date = new Date(bill.date).toLocaleDateString("en-PH", {
