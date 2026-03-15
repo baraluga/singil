@@ -29,12 +29,9 @@ export default function BillCard({ bill, settled = false }: BillCardProps) {
             {date} · {totalCount} {totalCount === 1 ? "person" : "people"}
           </div>
         </div>
-        <div style={{ textAlign: "right" }}>
+        <div>
           <div className="bill-amount">{formatCurrency(bill.total_amount)}</div>
           <span className="bill-amount-label">{settled ? "settled ✓" : "total"}</span>
-          {!settled && remaining > 0 && (
-            <div className="bill-my-share">{formatCurrency(remaining)} your share</div>
-          )}
         </div>
       </div>
 
