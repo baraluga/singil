@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
   const router = useRouter();
-  const [username, setUsername] = useState("admin");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -18,11 +17,11 @@ export default function LoginForm() {
     const res = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ password }),
     });
 
     if (!res.ok) {
-      setError("Wrong username or password.");
+      setError("Wrong password.");
       setIsLoading(false);
       return;
     }
@@ -32,18 +31,6 @@ export default function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit} className="w-full">
-      <div className="mb-4">
-        <label className="block text-[11px] font-semibold tracking-[0.08em] uppercase text-ink-muted mb-1.5">
-          Username
-        </label>
-        <input
-          type="text"
-          required
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="w-full bg-surface border border-border rounded-[10px] px-3.5 py-3 text-sm text-ink outline-none focus:border-accent"
-        />
-      </div>
       <div className="mb-4">
         <label className="block text-[11px] font-semibold tracking-[0.08em] uppercase text-ink-muted mb-1.5">
           Password
