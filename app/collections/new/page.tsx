@@ -3,6 +3,8 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 import { BillWithMembers } from "@/lib/types";
 import NewCollectionForm from "@/components/collections/NewCollectionForm";
 
+export const dynamic = "force-dynamic";
+
 export default async function NewCollectionPage() {
   const { data: bills } = await supabaseAdmin
     .from("bills")
