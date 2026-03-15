@@ -8,6 +8,7 @@ import Modal from "@/components/ui/Modal";
 import Toast from "@/components/ui/Toast";
 import PaymentMethodCard from "@/components/pay/PaymentMethodCard";
 import QrModal from "@/components/pay/QrModal";
+import { compressImage } from "@/lib/utils/image";
 
 interface CollectionBillCardProps {
   bill: BillWithMembers;
@@ -65,11 +66,12 @@ export default function CollectionBillCard({
     return <span className="bill-status-chip pending">Unpaid</span>;
   }
 
-  function handleProofSelect(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleProofSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    setProofFile(file);
     setProofPreview(URL.createObjectURL(file));
+    const compressed = await compressImage(file);
+    setProofFile(compressed);
   }
 
   async function handleCopyAmount() {
