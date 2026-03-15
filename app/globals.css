@@ -1172,6 +1172,7 @@ body {
 }
 .name-card.done {
   opacity: 0.5;
+  pointer-events: none;
 }
 .name-card-label {
   font-size: 13px;
