@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { Member } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils/currency";
 import { getShareBreakdown } from "@/lib/utils/split";
 import { getAvatarColor, getInitial } from "@/lib/utils/avatars";
 import { confirmPaid, dismissClaim, markPaid } from "@/lib/actions/members";
+import Modal from "@/components/ui/Modal";
 
 interface MemberDetailRowProps {
   member: Member;
@@ -16,6 +18,7 @@ interface MemberDetailRowProps {
 export default function MemberDetailRow({ member, scPct, index, billId }: MemberDetailRowProps) {
   const colors = getAvatarColor(index);
   const { food, sc } = getShareBreakdown(member.share_amount, scPct);
+  const [proofOpen, setProofOpen] = useState(false);
 
   return (
     <div style={{ marginBottom: 8 }}>
@@ -55,6 +58,11 @@ export default function MemberDetailRow({ member, scPct, index, billId }: Member
               <form action={dismissClaim.bind(null, member.id, billId)}>
                 <button type="submit" className="btn-mark">✗ Dismiss</button>
               </form>
+              {member.proof_url && (
+                <button className="btn-mark" onClick={() => setProofOpen(true)}>
+                  🧾 View proof
+                </button>
+              )}
             </>
           ) : (
             <form action={markPaid.bind(null, member.id, billId)}>
@@ -62,6 +70,10 @@ export default function MemberDetailRow({ member, scPct, index, billId }: Member
             </form>
           )}
         </div>
+      )}
+
+      {proofOpen && member.proof_url && (
+        <Modal src={member.proof_url} onClose={() => setProofOpen(false)} />
       )}
     </div>
   );

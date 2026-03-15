@@ -18,6 +18,7 @@ export interface Member {
   share_amount: number;
   is_paid: boolean;
   claimed_paid: boolean;
+  proof_url: string | null;
   created_at: string;
   updated_at: string;
 }
