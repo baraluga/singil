@@ -38,6 +38,12 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${dmSans.variable} ${dmSerifDisplay.variable}`}>
         {children}
+        <footer className="site-footer">
+          Built with spare time and Claude Code ·{" "}
+          <a href="https://github.com/baraluga/singil" target="_blank" rel="noopener noreferrer">
+            GitHub
+          </a>
+        </footer>
       </body>
     </html>
   );

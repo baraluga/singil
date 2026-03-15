@@ -92,6 +92,20 @@ body {
   text-decoration: none;
 }
 
+/* ── FOOTER ── */
+.site-footer {
+  text-align: center;
+  font-size: 11px;
+  color: var(--ink-muted);
+  padding: 24px 20px 32px;
+  opacity: 0.5;
+}
+.site-footer a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 /* ── TYPOGRAPHY ── */
 .page-title {
   font-family: var(--font-serif);
