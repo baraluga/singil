@@ -52,7 +52,7 @@ export default async function BillDetailPage({ params }: { params: Promise<{ id:
         <div className="max-w-sm mx-auto relative">
           {bill.receipt_url && <ReceiptThumbnail url={bill.receipt_url} />}
           {/* Decorative circle */}
-          <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-accent/15 pointer-events-none" />
+          <div className="absolute -right-8 -top-8 w-[120px] h-[120px] rounded-full bg-accent/15 pointer-events-none" />
           <h1 className="font-serif text-[22px] text-white">{bill.name}</h1>
           <p className="text-xs text-white/50 mt-1">
             {date} · {memberList.length} {memberList.length === 1 ? "member" : "members"} · SC {bill.service_charge_pct}%
@@ -69,7 +69,7 @@ export default async function BillDetailPage({ params }: { params: Promise<{ id:
         <ShareButtons billId={bill.id} billName={bill.name} />
 
         {/* Members section */}
-        <div className="text-[11px] font-semibold tracking-[0.1em] uppercase text-ink-muted mb-3">
+        <div className="text-[11px] font-semibold tracking-widest uppercase text-ink-muted mb-3">
           Members
         </div>
 

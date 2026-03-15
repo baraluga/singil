@@ -18,7 +18,7 @@ export default function ReceiptUpload({ preview, onChange }: ReceiptUploadProps)
   return (
     <div
       onClick={() => inputRef.current?.click()}
-      className="w-full h-20 bg-surface border border-dashed border-border rounded-[10px] flex flex-col items-center justify-center gap-1 text-ink-muted text-xs cursor-pointer hover:border-accent transition-colors"
+      className="w-full h-20 bg-surface border-[1.5px] border-dashed border-border rounded-[10px] flex flex-col items-center justify-center gap-1 text-ink-muted text-xs cursor-pointer hover:border-accent transition-colors"
     >
       <input
         ref={inputRef}

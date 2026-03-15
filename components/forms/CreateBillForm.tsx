@@ -218,7 +218,7 @@ export default function CreateBillForm() {
       <button
         type="button"
         onClick={addMember}
-        className="w-full flex items-center justify-center gap-1.5 bg-none border border-dashed border-border rounded-[10px] px-3.5 py-2.5 text-ink-muted text-[13px] font-medium"
+        className="w-full flex items-center justify-center gap-1.5 bg-none border-[1.5px] border-dashed border-border rounded-[10px] px-3.5 py-2.5 text-ink-muted text-[13px] font-medium"
       >
         ＋ Add member
       </button>

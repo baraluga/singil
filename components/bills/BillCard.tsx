@@ -24,7 +24,7 @@ export default function BillCard({ bill, settled = false }: BillCardProps) {
   return (
     <Link
       href={`/bills/${bill.id}`}
-      className={`block bg-surface border border-border rounded-xl p-4 mb-2.5 shadow-sm ${settled ? "opacity-60" : ""}`}
+      className={`block bg-surface border border-border rounded-2xl p-4 mb-2.5 shadow-md ${settled ? "opacity-60" : ""}`}
     >
       <div className="flex justify-between items-start mb-2.5">
         <div>

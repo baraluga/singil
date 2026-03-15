@@ -26,7 +26,7 @@ export default function MemberRow({
   return (
     <div className="flex items-center gap-2.5 bg-surface border border-border rounded-[10px] px-3 py-2.5">
       <div
-        className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold ${colors.bg} ${colors.text}`}
+        className={`w-[30px] h-[30px] rounded-full flex items-center justify-center shrink-0 text-xs font-bold ${colors.bg} ${colors.text}`}
       >
         {getInitial(member.name) || String(index + 1)}
       </div>
@@ -45,7 +45,7 @@ export default function MemberRow({
           value={member.amount || ""}
           onChange={(e) => onAmountChange(member.tempId, parseFloat(e.target.value) || 0)}
           placeholder="0"
-          className="w-24 bg-accent-light text-accent text-sm font-semibold text-right rounded-lg px-2.5 py-1.5 outline-none border-none"
+          className="w-24 bg-accent-light text-accent text-[13px] font-semibold text-right rounded-[8px] px-2.5 py-1.5 outline-none border-none"
         />
       )}
       {canRemove && (

@@ -70,7 +70,7 @@ export default async function BillsPage() {
         {/* Active bills */}
         {activeBills.length > 0 && (
           <>
-            <div className="text-[11px] font-semibold tracking-[0.1em] uppercase text-ink-muted mb-2.5">
+            <div className="text-[11px] font-semibold tracking-widest uppercase text-ink-muted mb-2.5">
               Active
             </div>
             {activeBills.map((bill) => (
@@ -82,7 +82,7 @@ export default async function BillsPage() {
         {/* Settled bills */}
         {settledBills.length > 0 && (
           <div className="mt-5">
-            <div className="text-[11px] font-semibold tracking-[0.1em] uppercase text-ink-muted mb-2.5">
+            <div className="text-[11px] font-semibold tracking-widest uppercase text-ink-muted mb-2.5">
               Settled
             </div>
             {settledBills.map((bill) => (

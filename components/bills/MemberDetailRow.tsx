@@ -19,9 +19,9 @@ export default function MemberDetailRow({ member, scPct, index, billId }: Member
 
   return (
     <div className="mb-2">
-      <div className="bg-surface border border-border rounded-xl px-4 py-3.5 flex items-center gap-3">
+      <div className="bg-surface border border-border rounded-2xl px-4 py-3.5 flex items-center gap-3">
         <div
-          className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold ${colors.bg} ${colors.text}`}
+          className={`w-[30px] h-[30px] rounded-full flex items-center justify-center shrink-0 text-xs font-bold ${colors.bg} ${colors.text}`}
         >
           {getInitial(member.name)}
         </div>
@@ -35,15 +35,15 @@ export default function MemberDetailRow({ member, scPct, index, billId }: Member
         <div className="flex flex-col items-end gap-1.5">
           <div className="font-serif text-[18px] text-ink">{formatCurrency(member.share_amount)}</div>
           {member.is_paid ? (
-            <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-green-light text-green">
+            <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-[3px] rounded-full bg-green-light text-green">
               ✓ Paid
             </span>
           ) : member.claimed_paid ? (
-            <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E]">
+            <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-[3px] rounded-full bg-[#FEF3C7] text-[#92400E]">
               ⚡ Claimed
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-bg text-ink-muted border border-border">
+            <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-[3px] rounded-full bg-bg text-ink-muted border border-border">
               Pending
             </span>
           )}
@@ -58,7 +58,7 @@ export default function MemberDetailRow({ member, scPct, index, billId }: Member
               <form action={confirmPaid.bind(null, member.id, billId)}>
                 <button
                   type="submit"
-                  className="bg-none border border-green rounded-lg px-2.5 py-1 text-[11px] font-semibold text-green"
+                  className="bg-none border border-green rounded-lg px-2.5 py-[5px] text-[11px] font-semibold text-green"
                 >
                   ✓ Confirm
                 </button>
@@ -66,7 +66,7 @@ export default function MemberDetailRow({ member, scPct, index, billId }: Member
               <form action={dismissClaim.bind(null, member.id, billId)}>
                 <button
                   type="submit"
-                  className="bg-none border border-border rounded-lg px-2.5 py-1 text-[11px] font-semibold text-ink-muted"
+                  className="bg-none border border-border rounded-lg px-2.5 py-[5px] text-[11px] font-semibold text-ink-muted"
                 >
                   ✗ Dismiss
                 </button>
@@ -76,7 +76,7 @@ export default function MemberDetailRow({ member, scPct, index, billId }: Member
             <form action={markPaid.bind(null, member.id, billId)}>
               <button
                 type="submit"
-                className="bg-none border border-green rounded-lg px-2.5 py-1 text-[11px] font-semibold text-green"
+                className="bg-none border border-green rounded-lg px-2.5 py-[5px] text-[11px] font-semibold text-green"
               >
                 ✓ Mark paid
               </button>
