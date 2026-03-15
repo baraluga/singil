@@ -36,7 +36,7 @@ const CREATOR_ID = "00000000-0000-0000-0000-000000000001";
 interface CreateBillInput {
   name: string;
   date: string;
-  serviceChargePct: number;
+  serviceChargeAmount: number;
   totalAmount: number;
   receiptUrl: string | null;
   splitMode: SplitMode;
@@ -51,7 +51,7 @@ export async function createBill(data: CreateBillInput): Promise<{ id: string } 
       name: data.name,
       date: data.date,
       total_amount: data.totalAmount,
-      service_charge_pct: data.serviceChargePct,
+      service_charge_amount: data.serviceChargeAmount,
       split_mode: data.splitMode,
       receipt_url: data.receiptUrl,
     })

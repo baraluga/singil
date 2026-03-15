@@ -13,14 +13,3 @@ export function calculateEqualSplit(totalAmount: number, memberCount: number): n
     return cents / 100;
   });
 }
-
-/**
- * Back-calculates food and SC breakdown for display purposes.
- * The share_amount stored in DB is the grand total per member (food + SC).
- */
-export function getShareBreakdown(shareAmount: number, scPct: number): { food: number; sc: number } {
-  if (scPct === 0) return { food: shareAmount, sc: 0 };
-  const food = Math.round(shareAmount / (1 + scPct / 100));
-  const sc = shareAmount - food;
-  return { food, sc };
-}

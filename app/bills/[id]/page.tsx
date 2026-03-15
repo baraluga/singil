@@ -53,7 +53,7 @@ export default async function BillDetailPage({ params }: { params: Promise<{ id:
             <EditableBillName billId={bill.id} name={bill.name} />
           )}
           <p className="bill-hero-meta">
-            {date} · {memberList.length} {memberList.length === 1 ? "member" : "members"} · SC {bill.service_charge_pct > 0 ? `≈${bill.service_charge_pct}%` : "none"}
+            {date} · {memberList.length} {memberList.length === 1 ? "member" : "members"} · SC {bill.service_charge_amount > 0 ? formatCurrency(bill.service_charge_amount) : "none"}
           </p>
           <p className="bill-hero-total">
             {formatCurrency(bill.total_amount)}{" "}
@@ -77,7 +77,7 @@ export default async function BillDetailPage({ params }: { params: Promise<{ id:
           <MemberDetailRow
             key={member.id}
             member={member}
-            scPct={bill.service_charge_pct}
+            scPerPerson={bill.service_charge_amount / Math.max(memberList.length, 1)}
             index={i}
             billId={bill.id}
           />

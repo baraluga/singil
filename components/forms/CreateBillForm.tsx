@@ -63,17 +63,14 @@ export default function CreateBillForm() {
 
   const totalAssigned = members.reduce((sum, m) => sum + m.amount, 0);
 
-  const computedScPct =
-    serviceChargeAmount > 0 && totalAmount > serviceChargeAmount
-      ? (serviceChargeAmount / (totalAmount - serviceChargeAmount)) * 100
-      : 0;
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
 
     if (!name.trim()) return setError("Bill name is required");
     if (totalAmount <= 0) return setError("Total amount must be greater than 0");
+    if (serviceChargeAmount >= totalAmount && serviceChargeAmount > 0)
+      return setError("Service charge cannot be equal to or exceed the total amount");
     const validMembers = members.filter((m) => m.name.trim());
     if (validMembers.length === 0) return setError("At least one member with a name is required");
     setIsSubmitting(true);
@@ -94,7 +91,7 @@ export default function CreateBillForm() {
     const result = await createBill({
       name: name.trim(),
       date,
-      serviceChargePct: computedScPct,
+      serviceChargeAmount,
       totalAmount,
       receiptUrl,
       splitMode,
@@ -147,9 +144,6 @@ export default function CreateBillForm() {
               className="field-input"
             />
           </div>
-          {computedScPct > 0 && (
-            <p className="field-hint">≈ {computedScPct.toFixed(2)}% of subtotal</p>
-          )}
         </div>
       </div>
 

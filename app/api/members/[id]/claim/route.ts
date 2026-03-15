@@ -24,11 +24,17 @@ export async function POST(
     return NextResponse.json({ ok: true, alreadyPaid: true });
   }
 
-  const { data: bill } = await supabaseAdmin
-    .from("bills")
-    .select("split_mode, service_charge_pct, total_amount")
-    .eq("id", member.bill_id)
-    .single();
+  const [{ data: bill }, { count: memberCount }] = await Promise.all([
+    supabaseAdmin
+      .from("bills")
+      .select("split_mode, service_charge_amount, total_amount")
+      .eq("id", member.bill_id)
+      .single(),
+    supabaseAdmin
+      .from("members")
+      .select("*", { count: "exact", head: true })
+      .eq("bill_id", member.bill_id),
+  ]);
 
   const isHonesty = bill?.split_mode === "honesty";
 
@@ -80,9 +86,9 @@ export async function POST(
     }
   }
 
-  const scPct = bill?.service_charge_pct ?? 0;
+  const scPerPerson = (bill?.service_charge_amount ?? 0) / Math.max(memberCount ?? 1, 1);
   const computedShareAmount = isHonesty && honestyFoodAmount
-    ? Math.round(honestyFoodAmount * (1 + scPct / 100) * 100) / 100
+    ? Math.round((honestyFoodAmount + scPerPerson) * 100) / 100
     : null;
 
   const updatePayload: Record<string, unknown> = { claimed_paid: true };
