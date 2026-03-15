@@ -1,101 +1,99 @@
-# Singil
+# singil
 
-Split bills and collect payments easily.
+> *Filipino. /siŋˈil/* — to collect what is owed.
 
-## Walking Skeleton Setup
+Split bills. Share a link. Get paid. No accounts needed for payees.
 
-This is a bullet-tracer development approach - deploy early, iterate fast.
+---
 
-### Prerequisites
+## How it works
 
-- [x] Next.js 16 with TypeScript and Tailwind v4
-- [x] Supabase project created
-- [x] Environment variables configured
-- [ ] Database schema applied
-- [ ] Storage buckets created
-- [ ] Deployed to Vercel
+```
+Organizer creates a bill → shares a link → payees tap "Bayad na ako!" → organizer confirms → done
+```
 
-### Setup Instructions
+**For organizers** — create bills, set amounts, choose equal or honesty split, add payment QR codes, track who's paid.
 
-#### 1. Database Setup
+**For payees** — open a link, pick your name, optionally attach proof, tap the button. That's it.
 
-Run the migration in Supabase SQL Editor:
-- File: [supabase/migrations/20260315_init_schema.sql](supabase/migrations/20260315_init_schema.sql)
-- Go to: https://supabase.com/dashboard/project/crmflgafhzdytacttxnq/sql/new
-- Copy, paste, and run
+---
 
-#### 2. Storage Setup
+## Stack
 
-Follow instructions in: [supabase/setup-storage.md](supabase/setup-storage.md)
+| | |
+|---|---|
+| Framework | Next.js 16 App Router |
+| Language | TypeScript 5.9 |
+| Database | Supabase (Postgres) |
+| Auth | Supabase Magic Link |
+| Storage | Supabase Storage |
+| Styling | Pure CSS + design tokens |
+| Deploy | Vercel |
+| Package manager | pnpm |
 
-Or use the Dashboard:
-1. Go to Storage → New Bucket
-2. Create "receipts" (public)
-3. Create "qr-codes" (public)
+---
 
-#### 3. Local Development
+## Local setup
 
 ```bash
 pnpm install
-pnpm run dev
+cp .env.example .env.local   # fill in Supabase keys
+pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+**Env vars needed:**
+```
+NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+SUPABASE_SECRET_KEY
+```
 
-#### 4. Deploy to Vercel
+---
+
+## Database & storage
+
+1. Run [`supabase/migrations/20260315_init_schema.sql`](supabase/migrations/20260315_init_schema.sql) in the Supabase SQL editor
+2. Follow [`supabase/setup-storage.md`](supabase/setup-storage.md) to create the `receipts` and `qr-codes` buckets
+
+---
+
+## Deploy
 
 ```bash
-# Install Vercel CLI
-pnpm add -g vercel
-
-# Deploy
 vercel
 ```
 
-Add environment variables in Vercel dashboard:
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
-- `SUPABASE_SECRET_KEY`
+Add the three env vars above in the Vercel dashboard.
 
-## Project Structure
+---
+
+## Project layout
 
 ```
-singil/
-├── app/                  # Next.js app directory
-│   ├── layout.tsx       # Root layout with fonts
-│   ├── globals.css      # Tailwind config with design tokens
-│   └── page.tsx         # Home page
-├── lib/                 # Shared utilities
-│   ├── supabase.ts      # Browser client
-│   ├── supabase-server.ts # SSR client
-│   └── supabase-admin.ts  # Admin client (server-only)
-├── middleware.ts        # Auth middleware
-└── supabase/
-    └── migrations/      # Database migrations
+app/
+  bills/         organizer bill management
+  collections/   multi-bill groupings
+  pay/           payee-facing payment flows
+  settings/      payment method + QR setup
+components/
+  bills/         bill detail, member rows
+  pay/           payee views, collection cards
+  ui/            shared primitives (toast, modal…)
+lib/
+  actions/       server actions
+  utils/         currency, split, avatars, celebration
 ```
 
-## Tech Stack
+---
 
-- **Framework**: Next.js 16.1 with App Router
-- **Language**: TypeScript 5.9
-- **Styling**: Tailwind CSS v4 with design tokens
-- **Database**: Supabase (PostgreSQL)
-- **Auth**: Supabase Auth (Magic Link)
-- **Storage**: Supabase Storage
-- **Deployment**: Vercel
-- **Package Manager**: pnpm
+## Design tokens
 
-## Design Tokens
+| Token | Value | |
+|---|---|---|
+| `--bg` | `#F5F0E8` | warm parchment background |
+| `--surface` | `#FDFAF4` | card surface |
+| `--ink` | `#1A1612` | primary text |
+| `--accent` | `#D4522A` | orange — action |
+| `--green` | `#2A7A4B` | success / paid |
 
-See [mockups.html](mockups.html) for the full design system.
-
-Key colors:
-- Background: `#F5F0E8`
-- Surface: `#FDFAF4`
-- Ink: `#1A1612`
-- Accent: `#D4522A`
-- Green: `#2A7A4B`
-
-Fonts:
-- Sans: DM Sans (300, 400, 500, 600)
-- Serif: DM Serif Display (regular, italic)
+Fonts: **DM Sans** (UI) + **DM Serif Display** (headings)
