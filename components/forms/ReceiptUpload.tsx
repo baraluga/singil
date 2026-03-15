@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { compressImage } from "@/lib/utils/image";
 
 interface ReceiptUploadProps {
   preview: string | null;
@@ -10,9 +11,11 @@ interface ReceiptUploadProps {
 export default function ReceiptUpload({ preview, onChange }: ReceiptUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    if (file) onChange(file);
+    if (!file) return;
+    const compressed = await compressImage(file);
+    onChange(compressed);
   }
 
   return (
