@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase";
-import { createBill } from "@/lib/actions/bills";
+import { createBill, uploadReceipt } from "@/lib/actions/bills";
 import { MemberInput, SplitMode } from "@/lib/types";
 import { calculateEqualSplit } from "@/lib/utils/split";
 import SplitToggle from "./SplitToggle";
@@ -81,19 +80,15 @@ export default function CreateBillForm() {
 
     let receiptUrl: string | null = null;
     if (receiptFile) {
-      const supabase = createClient();
-      const ext = receiptFile.name.split(".").pop();
-      const path = `${Date.now()}.${ext}`;
-      const { data, error: uploadError } = await supabase.storage
-        .from("receipts")
-        .upload(path, receiptFile, { upsert: true });
-      if (uploadError) {
-        setError(`Receipt upload failed: ${uploadError.message}`);
+      const fd = new FormData();
+      fd.append("file", receiptFile);
+      const result = await uploadReceipt(fd);
+      if ("error" in result) {
+        setError(`Receipt upload failed: ${result.error}`);
         setIsSubmitting(false);
         return;
       }
-      const { data: urlData } = supabase.storage.from("receipts").getPublicUrl(data.path);
-      receiptUrl = urlData.publicUrl;
+      receiptUrl = result.url;
     }
 
     const result = await createBill({

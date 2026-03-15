@@ -3,6 +3,24 @@
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { MemberInput } from "@/lib/types";
 
+export async function uploadReceipt(formData: FormData): Promise<{ url: string } | { error: string }> {
+  const file = formData.get("file") as File | null;
+  if (!file) return { error: "No file provided" };
+
+  const ext = file.name.split(".").pop();
+  const path = `${Date.now()}.${ext}`;
+  const buffer = Buffer.from(await file.arrayBuffer());
+
+  const { data, error } = await supabaseAdmin.storage
+    .from("receipts")
+    .upload(path, buffer, { contentType: file.type, upsert: true });
+
+  if (error) return { error: error.message };
+
+  const { data: urlData } = supabaseAdmin.storage.from("receipts").getPublicUrl(data.path);
+  return { url: urlData.publicUrl };
+}
+
 // Fixed creator ID — single-user app, no auth.users dependency needed
 const CREATOR_ID = "00000000-0000-0000-0000-000000000001";
 
