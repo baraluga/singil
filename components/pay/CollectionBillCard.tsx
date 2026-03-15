@@ -9,6 +9,7 @@ import Toast from "@/components/ui/Toast";
 import PaymentMethodCard from "@/components/pay/PaymentMethodCard";
 import QrModal from "@/components/pay/QrModal";
 import { compressImage } from "@/lib/utils/image";
+import { triggerPaymentCelebration } from "@/lib/utils/celebration";
 
 interface CollectionBillCardProps {
   bill: BillWithMembers;
@@ -38,6 +39,7 @@ export default function CollectionBillCard({
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [honestyItems, setHonestyItems] = useState<number[]>([0]);
   const [honestyConfirmed, setHonestyConfirmed] = useState(false);
+  const [popping, setPopping] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isHonesty = bill.split_mode === "honesty";
@@ -102,6 +104,9 @@ export default function CollectionBillCard({
         const data = await res.json();
         setClaimed(true);
         if (data.proof_url) setProofUrl(data.proof_url);
+        triggerPaymentCelebration();
+        setPopping(true);
+        setTimeout(() => setPopping(false), 400);
         setToastMsg("Payment sent!");
         onClaimed(member.id);
         onToggle(); // collapse after claim
@@ -332,7 +337,7 @@ export default function CollectionBillCard({
                       </button>
                     )}
                     <button
-                      className="btn-claim"
+                      className={`btn-claim${popping ? " pop" : ""}`}
                       onClick={handleClaim}
                       disabled={claiming}
                       style={{ marginTop: 10 }}
