@@ -86,7 +86,7 @@ export async function POST(
     }
   }
 
-  const scPerPerson = (bill?.service_charge_amount ?? 0) / Math.max(memberCount ?? 1, 1);
+  const scPerPerson = (bill?.service_charge_amount ?? 0) / Math.max((memberCount ?? 1) + 1, 1);
   const computedShareAmount = isHonesty && honestyFoodAmount
     ? Math.round((honestyFoodAmount + scPerPerson) * 100) / 100
     : null;

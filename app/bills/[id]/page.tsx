@@ -77,7 +77,7 @@ export default async function BillDetailPage({ params }: { params: Promise<{ id:
           <MemberDetailRow
             key={member.id}
             member={member}
-            scPerPerson={bill.service_charge_amount / Math.max(memberList.length, 1)}
+            scPerPerson={bill.service_charge_amount / Math.max(memberList.length + 1, 1)}
             index={i}
             billId={bill.id}
           />

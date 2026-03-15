@@ -53,7 +53,7 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
 
   const isHonesty = bill.split_mode === "honesty";
   const honestyAmount = honestyItems.reduce((s, v) => s + v, 0);
-  const scPerPerson = bill.service_charge_amount / Math.max(members.length, 1);
+  const scPerPerson = bill.service_charge_amount / Math.max(members.length + 1, 1);
   const honestyTotal = honestyAmount + scPerPerson;
 
   const selectedMember = members.find((m) => m.id === selectedMemberId) ?? null;
