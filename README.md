@@ -25,7 +25,7 @@ Organizer creates a bill → shares a link → payees tap "Bayad na ako!" → or
 | Framework | Next.js 16 App Router |
 | Language | TypeScript 5.9 |
 | Database | Supabase (Postgres) |
-| Auth | Supabase Magic Link |
+| Auth | Password-based (cookie session) |
 | Storage | Supabase Storage |
 | Styling | Pure CSS + design tokens |
 | Deploy | Vercel |
@@ -46,6 +46,8 @@ pnpm dev
 NEXT_PUBLIC_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 SUPABASE_SECRET_KEY
+CREATOR_PASSWORD          # organizer login password
+SESSION_SECRET            # openssl rand -base64 32
 ```
 
 ---
