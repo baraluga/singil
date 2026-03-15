@@ -27,7 +27,13 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
   const [proofOpen, setProofOpen] = useState(false);
   const [qrModal, setQrModal] = useState<{ name: string; qrUrl: string } | null>(null);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const [honestyItems, setHonestyItems] = useState<number[]>([0]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const isHonesty = bill.split_mode === "honesty";
+  const honestyAmount = honestyItems.reduce((s, v) => s + v, 0);
+  const honestyScAmount = honestyAmount * (bill.service_charge_pct / 100);
+  const honestyTotal = honestyAmount + honestyScAmount;
 
   const selectedMember = members.find((m) => m.id === selectedMemberId) ?? null;
 
@@ -52,6 +58,7 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
       if (proofFile) {
         const formData = new FormData();
         formData.append("file", proofFile);
+        if (isHonesty) formData.append("amount", String(honestyAmount));
         res = await fetch(`/api/members/${selectedMember.id}/claim`, {
           method: "POST",
           body: formData,
@@ -60,7 +67,7 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
         res = await fetch(`/api/members/${selectedMember.id}/claim`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({}),
+          body: JSON.stringify(isHonesty ? { amount: honestyAmount } : {}),
         });
       }
       if (res.ok) {
@@ -80,7 +87,8 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
 
   async function handleCopyAmount() {
     if (!selectedMember) return;
-    await navigator.clipboard.writeText(formatCurrency(selectedMember.share_amount));
+    const amount = isHonesty && selectedMember.share_amount === 0 ? honestyTotal : selectedMember.share_amount;
+    await navigator.clipboard.writeText(formatCurrency(amount));
     setToastMsg("Amount copied!");
   }
 
@@ -149,28 +157,109 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
             ← Oops, wrong person!
           </button>
 
-          {/* Share card */}
-          <div className="share-card">
-            <p className="share-card-label">Your share</p>
-            <p className="share-amount">{formatCurrency(selectedMember.share_amount)}</p>
-            {(() => {
-              const { food, sc } = getShareBreakdown(selectedMember.share_amount, bill.service_charge_pct);
-              return (
-                <p className="share-breakdown">
-                  {formatCurrency(food)} food + {formatCurrency(sc)} SC ({bill.service_charge_pct}%)
-                </p>
-              );
-            })()}
-            <button className="share-copy-btn" onClick={handleCopyAmount}>
-              Copy amount
-            </button>
-          </div>
+          {/* Honesty mode: inline receipt + amount input */}
+          {isHonesty && !hasClaimed ? (
+            <>
+              {bill.receipt_url && (
+                <button
+                  className="honesty-receipt-btn"
+                  onClick={() => setReceiptOpen(true)}
+                  aria-label="View receipt"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={bill.receipt_url} alt="Receipt" className="honesty-receipt-img" />
+                  <span className="honesty-receipt-overlay">🔍 Tap to expand</span>
+                </button>
+              )}
+              <div className="share-card">
+                <p className="share-card-label">Your items</p>
+                <div className="honesty-items-list">
+                  {honestyItems.map((val, idx) => (
+                    <div key={idx} className="honesty-item-row">
+                      <div className="field-input-prefix" style={{ flex: 1 }}>
+                        <span className="prefix">₱</span>
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={val || ""}
+                          onChange={(e) => {
+                            const updated = [...honestyItems];
+                            updated[idx] = parseFloat(e.target.value) || 0;
+                            setHonestyItems(updated);
+                          }}
+                          placeholder="0.00"
+                          className="field-input"
+                          // eslint-disable-next-line jsx-a11y/no-autofocus
+                          autoFocus={idx === 0}
+                        />
+                      </div>
+                      {honestyItems.length > 1 && (
+                        <button
+                          type="button"
+                          className="honesty-item-remove"
+                          onClick={() => setHonestyItems(honestyItems.filter((_, i) => i !== idx))}
+                          aria-label="Remove item"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  className="honesty-add-item-btn"
+                  onClick={() => setHonestyItems([...honestyItems, 0])}
+                >
+                  + Add item
+                </button>
+                {honestyAmount > 0 && (
+                  <div className="honesty-summary">
+                    <div className="honesty-summary-row">
+                      <span>Subtotal</span>
+                      <span>{formatCurrency(honestyAmount)}</span>
+                    </div>
+                    {bill.service_charge_pct > 0 && (
+                      <div className="honesty-summary-row sc">
+                        <span>SC ({bill.service_charge_pct}%)</span>
+                        <span>+{formatCurrency(honestyScAmount)}</span>
+                      </div>
+                    )}
+                    <div className="honesty-summary-row total">
+                      <span>Total</span>
+                      <span>{formatCurrency(honestyTotal)}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="share-card">
+                <p className="share-card-label">Your share</p>
+                <p className="share-amount">{formatCurrency(isHonesty ? honestyTotal : selectedMember.share_amount)}</p>
+                {(() => {
+                  const amount = isHonesty ? honestyTotal : selectedMember.share_amount;
+                  const { food, sc } = getShareBreakdown(amount, bill.service_charge_pct);
+                  return (
+                    <p className="share-breakdown">
+                      {formatCurrency(food)} food + {formatCurrency(sc)} SC ({bill.service_charge_pct}%)
+                    </p>
+                  );
+                })()}
+                <button className="share-copy-btn" onClick={handleCopyAmount}>
+                  Copy amount
+                </button>
+              </div>
 
-          {/* Receipt link */}
-          {bill.receipt_url && (
-            <button className="receipt-link-btn" onClick={() => setReceiptOpen(true)}>
-              🧾 View receipt
-            </button>
+              {/* Receipt link — shown for non-honesty or after claiming */}
+              {bill.receipt_url && (
+                <button className="receipt-link-btn" onClick={() => setReceiptOpen(true)}>
+                  🧾 View receipt
+                </button>
+              )}
+            </>
           )}
 
           {/* Payment methods */}
@@ -236,7 +325,7 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
                 <button
                   className="btn-claim"
                   onClick={handleClaim}
-                  disabled={claiming}
+                  disabled={claiming || (isHonesty && honestyAmount <= 0)}
                   style={{ marginTop: 10 }}
                 >
                   {claiming ? "Sending..." : "Bayad na ako!"}
