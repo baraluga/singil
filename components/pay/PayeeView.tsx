@@ -19,13 +19,18 @@ interface PayeeViewProps {
 const STORAGE_KEY = (billId: string) => `singil:claim:${billId}`;
 
 export default function PayeeView({ bill, members, paymentMethods }: PayeeViewProps) {
-  const [selectedMemberId, setSelectedMemberId] = useState<string | null>(() => {
+  const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
+
+  // Restore claimed member from localStorage after mount (avoids SSR mismatch)
+  useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY(bill.id));
-      if (stored && members.some((m) => m.id === stored)) return stored;
+      if (stored && members.some((m) => m.id === stored)) {
+        setSelectedMemberId(stored);
+      }
     } catch {}
-    return null;
-  });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [claiming, setClaiming] = useState(false);
   const [claimedIds, setClaimedIds] = useState<Set<string>>(new Set());
   const [proofFile, setProofFile] = useState<File | null>(null);
