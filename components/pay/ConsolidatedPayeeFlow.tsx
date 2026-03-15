@@ -55,6 +55,7 @@ export default function ConsolidatedPayeeFlow({
     const member = findMemberByName(memberName, bill)!;
     if (bill.split_mode === "equal") return member.share_amount;
     const foodAmount = (billItems[bill.id] ?? [0]).reduce((s, v) => s + v, 0);
+    if (foodAmount === 0) return 0;
     const scPerPerson = calcScPerPerson(bill.service_charge_amount, bill.members.length);
     return foodAmount + scPerPerson;
   }
