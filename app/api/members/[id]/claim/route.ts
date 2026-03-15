@@ -12,7 +12,7 @@ export async function POST(
 
   const { data: member, error: fetchError } = await supabaseAdmin
     .from("members")
-    .select("id, is_paid")
+    .select("id, is_paid, bill_id")
     .eq("id", id)
     .single();
 
@@ -24,13 +24,24 @@ export async function POST(
     return NextResponse.json({ ok: true, alreadyPaid: true });
   }
 
+  const { data: bill } = await supabaseAdmin
+    .from("bills")
+    .select("split_mode, service_charge_pct, total_amount")
+    .eq("id", member.bill_id)
+    .single();
+
+  const isHonesty = bill?.split_mode === "honesty";
+
   let proof_url: string | null = null;
+  let honestyFoodAmount: number | null = null;
 
   const contentType = request.headers.get("content-type") ?? "";
 
   if (contentType.includes("multipart/form-data")) {
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
+    const amountRaw = formData.get("amount");
+    if (isHonesty && amountRaw) honestyFoodAmount = parseFloat(String(amountRaw)) || null;
 
     if (file) {
       if (!ALLOWED_TYPES.includes(file.type)) {
@@ -55,11 +66,32 @@ export async function POST(
       const { data: urlData } = supabaseAdmin.storage.from("receipts").getPublicUrl(uploadData.path);
       proof_url = urlData.publicUrl;
     }
+  } else {
+    const body = await request.json().catch(() => ({}));
+    if (isHonesty && body.amount != null) honestyFoodAmount = parseFloat(body.amount) || null;
   }
+
+  if (isHonesty) {
+    if (!honestyFoodAmount || honestyFoodAmount <= 0) {
+      return NextResponse.json({ error: "Amount is required for honesty mode" }, { status: 400 });
+    }
+    if (bill && honestyFoodAmount > bill.total_amount) {
+      return NextResponse.json({ error: "Amount exceeds bill total" }, { status: 400 });
+    }
+  }
+
+  const scPct = bill?.service_charge_pct ?? 0;
+  const computedShareAmount = isHonesty && honestyFoodAmount
+    ? Math.round(honestyFoodAmount * (1 + scPct / 100) * 100) / 100
+    : null;
+
+  const updatePayload: Record<string, unknown> = { claimed_paid: true };
+  if (proof_url) updatePayload.proof_url = proof_url;
+  if (computedShareAmount != null) updatePayload.share_amount = computedShareAmount;
 
   const { error: updateError } = await supabaseAdmin
     .from("members")
-    .update({ claimed_paid: true, ...(proof_url ? { proof_url } : {}) })
+    .update(updatePayload)
     .eq("id", id);
 
   if (updateError) {
