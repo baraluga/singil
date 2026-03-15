@@ -100,6 +100,7 @@ export default function CollectionBillCard({
         const data = await res.json();
         setClaimed(true);
         if (data.proof_url) setProofUrl(data.proof_url);
+        setToastMsg("Payment sent!");
         onClaimed(member.id);
         onToggle(); // collapse after claim
       } else {

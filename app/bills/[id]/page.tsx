@@ -6,6 +6,7 @@ import MemberDetailRow from "@/components/bills/MemberDetailRow";
 import ShareButtons from "@/components/bills/ShareButtons";
 import ReceiptThumbnail from "@/components/bills/ReceiptThumbnail";
 import SettleButton from "@/components/bills/SettleButton";
+import EditableBillName from "@/components/bills/EditableBillName";
 
 export default async function BillDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -45,7 +46,11 @@ export default async function BillDetailPage({ params }: { params: Promise<{ id:
         <div className="bill-hero-inner" style={{ padding: "0 20px" }}>
           <div className="bill-hero-circle" />
           {bill.receipt_url && <ReceiptThumbnail url={bill.receipt_url} />}
-          <h1 className="bill-hero-name">{bill.name}</h1>
+          {bill.is_settled ? (
+            <h1 className="bill-hero-name">{bill.name}</h1>
+          ) : (
+            <EditableBillName billId={bill.id} name={bill.name} />
+          )}
           <p className="bill-hero-meta">
             {date} · {memberList.length} {memberList.length === 1 ? "member" : "members"} · SC {bill.service_charge_pct}%
           </p>

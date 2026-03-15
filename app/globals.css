@@ -745,6 +745,69 @@ body {
   border: 1px solid var(--border);
 }
 
+/* ── EDITABLE NAME ── */
+.editable-name {
+  cursor: pointer;
+  border-bottom: 1px dashed transparent;
+  transition: border-color 0.15s;
+  display: inline-block;
+}
+.editable-name:hover {
+  border-bottom-color: rgba(255,255,255,0.4);
+}
+.member-detail-name.editable-name:hover {
+  border-bottom-color: var(--border);
+}
+.editable-name-input {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 6px;
+  padding: 2px 6px;
+  outline: none;
+  width: 100%;
+}
+.member-detail-info .editable-name-input {
+  background: var(--surface);
+  border-color: var(--accent);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ── SETTLE CONFIRMATION ── */
+.settle-confirm-msg {
+  font-size: 13px;
+  color: var(--ink-muted);
+  text-align: center;
+  margin-bottom: 8px;
+}
+.settle-confirm-row {
+  display: flex;
+  gap: 8px;
+}
+.settle-confirm-row .btn-green {
+  flex: 1;
+}
+.btn-cancel {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+}
+.btn-cancel:hover {
+  border-color: var(--ink-muted);
+}
+
 /* ── SETTLED ── */
 .settled-notice {
   margin-top: 16px;

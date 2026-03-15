@@ -28,6 +28,13 @@ export async function markPaid(memberId: string, billId: string) {
   revalidatePath(`/bills/${billId}`);
 }
 
+export async function updateMemberName(memberId: string, name: string, billId: string) {
+  const trimmed = name.trim();
+  if (!trimmed) return;
+  await supabaseAdmin.from("members").update({ name: trimmed }).eq("id", memberId);
+  revalidatePath(`/bills/${billId}`);
+}
+
 export async function settleBill(billId: string) {
   await supabaseAdmin
     .from("bills")

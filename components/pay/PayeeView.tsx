@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Bill, Member, PaymentMethod } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils/currency";
 import { getShareBreakdown } from "@/lib/utils/split";
@@ -30,6 +30,14 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
   const [honestyItems, setHonestyItems] = useState<number[]>([0]);
   const [honestyConfirmed, setHonestyConfirmed] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setHonestyItems([0]);
+    setHonestyConfirmed(false);
+    setProofFile(null);
+    setProofPreview(null);
+    setProofUrl(null);
+  }, [selectedMemberId]);
 
   const isHonesty = bill.split_mode === "honesty";
   const honestyAmount = honestyItems.reduce((s, v) => s + v, 0);
@@ -75,6 +83,7 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
         const data = await res.json();
         setClaimedIds((prev) => new Set(prev).add(selectedMember.id));
         if (data.proof_url) setProofUrl(data.proof_url);
+        setToastMsg("Payment sent!");
       } else {
         const data = await res.json().catch(() => ({}));
         setToastMsg(data.error ?? "Something went wrong. Please try again.");
@@ -158,9 +167,11 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
         </div>
       ) : selectedMember ? (
         <div className="pay-inner">
-          <button className="pay-back-btn" onClick={() => setSelectedMemberId(null)}>
-            ← Oops, wrong person!
-          </button>
+          {!hasClaimed && (
+            <button className="pay-back-btn" onClick={() => setSelectedMemberId(null)}>
+              ← Oops, wrong person!
+            </button>
+          )}
 
           {/* Honesty mode: two-step — item entry then review */}
           {isHonesty && !hasClaimed ? (

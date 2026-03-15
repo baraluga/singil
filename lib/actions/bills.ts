@@ -1,7 +1,16 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { MemberInput, SplitMode } from "@/lib/types";
+
+export async function updateBillName(billId: string, name: string) {
+  const trimmed = name.trim();
+  if (!trimmed) return;
+  await supabaseAdmin.from("bills").update({ name: trimmed }).eq("id", billId);
+  revalidatePath(`/bills/${billId}`);
+  revalidatePath("/bills");
+}
 
 export async function uploadReceipt(formData: FormData): Promise<{ url: string } | { error: string }> {
   const file = formData.get("file") as File | null;

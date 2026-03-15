@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { Member } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils/currency";
 import { getShareBreakdown } from "@/lib/utils/split";
 import { getAvatarColor, getInitial } from "@/lib/utils/avatars";
-import { confirmPaid, dismissClaim, markPaid } from "@/lib/actions/members";
+import { confirmPaid, dismissClaim, markPaid, updateMemberName } from "@/lib/actions/members";
 import Modal from "@/components/ui/Modal";
 import Toast from "@/components/ui/Toast";
 
@@ -23,6 +23,23 @@ export default function MemberDetailRow({ member, scPct, index, billId }: Member
   const [proofOpen, setProofOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [editingName, setEditingName] = useState(false);
+  const [editNameValue, setEditNameValue] = useState(member.name);
+  const nameInputRef = useRef<HTMLInputElement>(null);
+
+  function saveMemberName() {
+    const trimmed = editNameValue.trim();
+    if (!trimmed || trimmed === member.name) { setEditingName(false); return; }
+    startTransition(async () => {
+      await updateMemberName(member.id, trimmed, billId);
+      setEditingName(false);
+    });
+  }
+
+  function handleNameKeyDown(e: React.KeyboardEvent) {
+    if (e.key === "Enter") saveMemberName();
+    if (e.key === "Escape") setEditingName(false);
+  }
 
   function runAction(action: () => Promise<void>, successMsg: string) {
     startTransition(async () => {
@@ -41,7 +58,26 @@ export default function MemberDetailRow({ member, scPct, index, billId }: Member
           {getInitial(member.name)}
         </div>
         <div className="member-detail-info">
-          <div className="member-detail-name">{member.name}</div>
+          {!member.is_paid && editingName ? (
+            <input
+              ref={nameInputRef}
+              className="editable-name-input"
+              value={editNameValue}
+              onChange={(e) => setEditNameValue(e.target.value)}
+              onBlur={saveMemberName}
+              onKeyDown={handleNameKeyDown}
+              disabled={isPending}
+              autoFocus
+            />
+          ) : (
+            <div
+              className={`member-detail-name${!member.is_paid ? " editable-name" : ""}`}
+              onClick={() => { if (!member.is_paid) { setEditNameValue(member.name); setEditingName(true); } }}
+              title={!member.is_paid ? "Click to edit" : undefined}
+            >
+              {member.name}
+            </div>
+          )}
           <div className="member-detail-sub">
             {hasAmount ? (
               <>{formatCurrency(food)} + {formatCurrency(sc)} SC{member.claimed_paid && !member.is_paid && " · claimed paid"}</>
