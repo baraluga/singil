@@ -36,7 +36,7 @@ export default function ItemRow({
           value={item.amount || ""}
           onChange={(e) => onAmountChange(item.tempId, parseFloat(e.target.value) || 0)}
           placeholder="0.00"
-          className="item-entry-amount"
+          className="field-input item-entry-amount"
         />
       </div>
       {canRemove && (
