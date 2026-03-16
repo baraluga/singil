@@ -49,6 +49,11 @@ export default async function CollectionPayPage({
     ? await supabaseAdmin.from("members").select("*").in("bill_id", allBillIds)
     : { data: [] };
 
+  const itemizedBillIds = bills.filter((b) => b.split_mode === "itemized").map((b) => b.id);
+  const { data: allBillItems } = itemizedBillIds.length
+    ? await supabaseAdmin.from("bill_items").select("*").in("bill_id", itemizedBillIds).order("created_at")
+    : { data: [] };
+
   // Sort bills by junction sort_order
   const billsWithMembers: BillWithMembers[] = billIds
     .map((billId) => {
@@ -57,6 +62,7 @@ export default async function CollectionPayPage({
       return {
         ...bill,
         members: (allMembers ?? []).filter((m) => m.bill_id === bill.id),
+        items: (allBillItems ?? []).filter((i) => i.bill_id === bill.id),
       };
     })
     .filter(Boolean) as BillWithMembers[];

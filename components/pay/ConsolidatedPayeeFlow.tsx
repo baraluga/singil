@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { BillWithMembers, Member, PaymentMethod } from "@/lib/types";
+import { BillItem, BillWithMembers, Member, PaymentMethod } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils/currency";
 import { calcScPerPerson } from "@/lib/utils/split";
 import Modal from "@/components/ui/Modal";
@@ -42,9 +42,12 @@ export default function ConsolidatedPayeeFlow({
     if (bill.split_mode === "honesty") initialItems[bill.id] = [0];
   }
   const [billItems, setBillItems] = useState<Record<string, number[]>>(initialItems);
+  const [billSelectedItems, setBillSelectedItems] = useState<Record<string, Set<string>>>({});
   const hasHonestyBills = unpaidBills.some((b) => b.split_mode === "honesty");
+  const hasItemizedBills = unpaidBills.some((b) => b.split_mode === "itemized");
+  const needsItemPhase = hasHonestyBills || hasItemizedBills;
   const [phase, setPhase] = useState<"items" | "payment">(
-    hasHonestyBills ? "items" : "payment"
+    needsItemPhase ? "items" : "payment"
   );
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [proofPreview, setProofPreview] = useState<string | null>(null);
@@ -60,9 +63,16 @@ export default function ConsolidatedPayeeFlow({
   function getBillTotal(bill: BillWithMembers): number {
     const member = findMemberByName(memberName, bill)!;
     if (bill.split_mode === "equal") return member.share_amount;
+    const scPerPerson = calcScPerPerson(bill.service_charge_amount, bill.members.length);
+    if (bill.split_mode === "itemized") {
+      const selected = billSelectedItems[bill.id] ?? new Set<string>();
+      const foodAmount = (bill.items ?? [])
+        .filter((i) => selected.has(i.id))
+        .reduce((s, i) => s + i.amount, 0);
+      return foodAmount > 0 ? foodAmount + scPerPerson : 0;
+    }
     const foodAmount = (billItems[bill.id] ?? [0]).reduce((s, v) => s + v, 0);
     if (foodAmount === 0) return 0;
-    const scPerPerson = calcScPerPerson(bill.service_charge_amount, bill.members.length);
     return foodAmount + scPerPerson;
   }
 
@@ -71,6 +81,10 @@ export default function ConsolidatedPayeeFlow({
   const allHonestyFilled = unpaidBills
     .filter((b) => b.split_mode === "honesty")
     .every((b) => (billItems[b.id] ?? [0]).reduce((s, v) => s + v, 0) > 0);
+
+  const allItemizedFilled = unpaidBills
+    .filter((b) => b.split_mode === "itemized")
+    .every((b) => (billSelectedItems[b.id]?.size ?? 0) > 0);
 
   // ── Handlers ─────────────────────────────────────────────────────────────────
 
@@ -92,10 +106,14 @@ export default function ConsolidatedPayeeFlow({
       const claimsPayload = unpaidBills.map((bill) => {
         const member = findMemberByName(memberName, bill)!;
         const isHonesty = bill.split_mode === "honesty";
+        const isItemized = bill.split_mode === "itemized";
         return {
           memberId: member.id,
           ...(isHonesty && {
             amount: (billItems[bill.id] ?? [0]).reduce((s, v) => s + v, 0),
+          }),
+          ...(isItemized && {
+            itemIds: [...(billSelectedItems[bill.id] ?? new Set<string>())],
           }),
         };
       });
@@ -158,10 +176,13 @@ export default function ConsolidatedPayeeFlow({
                   {isHonesty && foodAmount === 0 && (
                     <span className="bill-needs-items">needs items</span>
                   )}
+                  {bill.split_mode === "itemized" && (billSelectedItems[bill.id]?.size ?? 0) === 0 && (
+                    <span className="bill-needs-items">select items</span>
+                  )}
                 </div>
 
                 {bill.receipt_url && (
-                  isHonesty ? (
+                  (isHonesty || bill.split_mode === "itemized") ? (
                     <button
                       className="honesty-receipt-btn"
                       onClick={() => setReceiptModal(bill.receipt_url!)}
@@ -181,7 +202,74 @@ export default function ConsolidatedPayeeFlow({
                   )
                 )}
 
-                {isHonesty ? (
+                {bill.split_mode === "itemized" ? (
+                  (() => {
+                    const items: BillItem[] = bill.items ?? [];
+                    const selected = billSelectedItems[bill.id] ?? new Set<string>();
+                    const selectedAmount = items
+                      .filter((i) => selected.has(i.id))
+                      .reduce((s, i) => s + i.amount, 0);
+                    return (
+                      <div className="share-card">
+                        <p className="share-card-label">Select your items</p>
+                        <div className="itemized-list">
+                          {items.map((item) => {
+                            const isSelected = selected.has(item.id);
+                            const claimedByOther = item.claimed_by && !bill.members.some(
+                              (m) => m.name.toLowerCase().trim() === memberName.toLowerCase().trim() && m.id === item.claimed_by
+                            );
+                            const claimerName = claimedByOther
+                              ? bill.members.find((m) => m.id === item.claimed_by)?.name ?? "Someone"
+                              : null;
+
+                            return (
+                              <button
+                                key={item.id}
+                                type="button"
+                                className={`itemized-item${isSelected ? " selected" : ""}${claimedByOther ? " claimed" : ""}`}
+                                onClick={() => {
+                                  if (claimedByOther) return;
+                                  setBillSelectedItems((prev) => {
+                                    const next = new Set(prev[bill.id] ?? []);
+                                    if (next.has(item.id)) next.delete(item.id);
+                                    else next.add(item.id);
+                                    return { ...prev, [bill.id]: next };
+                                  });
+                                }}
+                                disabled={!!claimedByOther}
+                              >
+                                <span className="itemized-check">{isSelected ? "✓" : ""}</span>
+                                <span className="itemized-item-name">{item.name}</span>
+                                <span className="itemized-item-amount">{formatCurrency(item.amount)}</span>
+                                {claimerName && (
+                                  <span className="itemized-item-claimed-by">{claimerName}</span>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        {selectedAmount > 0 && (
+                          <div className="honesty-summary">
+                            <div className="honesty-summary-row">
+                              <span>Subtotal</span>
+                              <span>{formatCurrency(selectedAmount)}</span>
+                            </div>
+                            {scPerPerson > 0 && (
+                              <div className="honesty-summary-row sc">
+                                <span>SC (split equally)</span>
+                                <span>+{formatCurrency(scPerPerson)}</span>
+                              </div>
+                            )}
+                            <div className="honesty-summary-row total">
+                              <span>Bill total</span>
+                              <span>{formatCurrency(selectedAmount + scPerPerson)}</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()
+                ) : isHonesty ? (
                   <div className="share-card">
                     <p className="share-card-label">Your items</p>
                     <div className="honesty-items-list">
@@ -274,7 +362,7 @@ export default function ConsolidatedPayeeFlow({
           <button
             type="button"
             className="btn-primary"
-            disabled={!allHonestyFilled}
+            disabled={!allHonestyFilled || !allItemizedFilled}
             onClick={() => setPhase("payment")}
           >
             Confirm items →
@@ -283,7 +371,7 @@ export default function ConsolidatedPayeeFlow({
       ) : (
         /* ── Phase 2: Payment ────────────────────────────────────────── */
         <>
-          {hasHonestyBills && (
+          {needsItemPhase && (
             <button
               className="pay-back-btn"
               style={{ marginBottom: 12 }}
