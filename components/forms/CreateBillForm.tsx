@@ -159,6 +159,11 @@ export default function CreateBillForm() {
         />
       </div>
 
+      <div className="field-group">
+        <label className="field-label">Receipt Photo</label>
+        <ReceiptUpload preview={receiptPreview} onChange={handleReceiptChange} />
+      </div>
+
       <div className="field-label" style={{ marginBottom: 8 }}>Split Mode</div>
       <SplitToggle value={splitMode} onChange={handleSplitModeChange} />
 
@@ -221,11 +226,6 @@ export default function CreateBillForm() {
             className="field-input"
           />
         </div>
-      </div>
-
-      <div className="field-group">
-        <label className="field-label">Receipt Photo</label>
-        <ReceiptUpload preview={receiptPreview} onChange={handleReceiptChange} />
       </div>
 
       <div className="field-label" style={{ marginBottom: 8 }}>Members</div>
