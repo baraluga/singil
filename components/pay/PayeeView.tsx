@@ -207,7 +207,7 @@ export default function PayeeView({ bill, members, paymentMethods, billItems: in
             </button>
           )}
 
-          {isItemized && !hasClaimed ? (
+          {isItemized && !hasClaimed && !allItemsTaken ? (
             <>
               {bill.receipt_url && (
                 <ReceiptThumbnail src={bill.receipt_url} onClick={() => setReceiptOpen(true)} />

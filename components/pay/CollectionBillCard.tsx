@@ -166,7 +166,7 @@ export default function CollectionBillCard({
             </>
           ) : (
             <>
-              {isItemized ? (
+              {isItemized && !allItemsTaken ? (
                 <>
                   {bill.receipt_url && (
                     <ReceiptThumbnail src={bill.receipt_url} onClick={() => setReceiptOpen(true)} />
