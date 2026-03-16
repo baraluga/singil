@@ -23,7 +23,7 @@ function newItem(): BillItemInput {
 export default function CreateBillForm() {
   const router = useRouter();
   const [name, setName] = useState("");
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const date = new Date().toISOString().split("T")[0];
   const [serviceChargeAmount, setServiceChargeAmount] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0);
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
@@ -161,32 +161,13 @@ export default function CreateBillForm() {
         />
       </div>
 
-      <div className="row-2" style={{ marginBottom: 16 }}>
-        <div className="field-group" style={{ marginBottom: 0 }}>
-          <label className="field-label">Date</label>
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="field-input"
-          />
-        </div>
-        <div className="field-group" style={{ marginBottom: 0 }}>
-          <label className="field-label">Service Charge</label>
-          <div className="field-input-prefix">
-            <span className="prefix">₱</span>
-            <input
-              type="number"
-              min="0"
-              step="0.01"
-              value={serviceChargeAmount || ""}
-              onChange={(e) => setServiceChargeAmount(parseFloat(e.target.value) || 0)}
-              placeholder="0.00"
-              className="field-input"
-            />
-          </div>
-        </div>
+      <div className="field-group">
+        <label className="field-label">Receipt Photo</label>
+        <ReceiptUpload preview={receiptPreview} onChange={handleReceiptChange} />
       </div>
+
+      <div className="field-label" style={{ marginBottom: 8 }}>Split Mode</div>
+      <SplitToggle value={splitMode} onChange={handleSplitModeChange} />
 
       {splitMode === "itemized" ? (
         <div className="field-group">
@@ -211,14 +192,6 @@ export default function CreateBillForm() {
         </div>
       )}
 
-      <div className="field-group">
-        <label className="field-label">Receipt Photo</label>
-        <ReceiptUpload preview={receiptPreview} onChange={handleReceiptChange} />
-      </div>
-
-      <div className="field-label" style={{ marginBottom: 8 }}>Split Mode</div>
-      <SplitToggle value={splitMode} onChange={handleSplitModeChange} />
-
       {splitMode === "itemized" && (
         <>
           <div className="field-label" style={{ marginBottom: 8 }}>Receipt Items</div>
@@ -240,6 +213,22 @@ export default function CreateBillForm() {
           </button>
         </>
       )}
+
+      <div className="field-group">
+        <label className="field-label">Service Charge</label>
+        <div className="field-input-prefix">
+          <span className="prefix">₱</span>
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            value={serviceChargeAmount || ""}
+            onChange={(e) => setServiceChargeAmount(parseFloat(e.target.value) || 0)}
+            placeholder="0.00"
+            className="field-input"
+          />
+        </div>
+      </div>
 
       <div className="field-label" style={{ marginBottom: 8 }}>Members</div>
       <div className="members-list">
