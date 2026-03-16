@@ -61,7 +61,8 @@ export default function CollectionBillCard({
   const isPaid = member.is_paid;
   const hasClaimed = claimed || member.claimed_paid;
   const claimProofUrl = proofUrl || member.proof_url || null;
-  const showPaymentSection = (!isHonesty && !isItemized) || hasClaimed || honestyConfirmed || itemizedConfirmed;
+  const allItemsTaken = isItemized && currentBillItems.length > 0 && currentBillItems.every((i) => i.claimed_by && i.claimed_by !== member.id);
+  const showPaymentSection = (!isHonesty && !isItemized) || hasClaimed || honestyConfirmed || itemizedConfirmed || allItemsTaken;
 
   const displayAmount = (isHonesty || isItemized) && member.share_amount === 0
     ? null
@@ -171,7 +172,7 @@ export default function CollectionBillCard({
                     <ReceiptThumbnail src={bill.receipt_url} onClick={() => setReceiptOpen(true)} />
                   )}
 
-                  {!itemizedConfirmed ? (
+                  {!itemizedConfirmed && !allItemsTaken ? (
                     <div className="share-card">
                       <p className="share-card-label">Select your items</p>
                       <div className="itemized-list">
@@ -202,7 +203,7 @@ export default function CollectionBillCard({
                       <button
                         type="button"
                         className="btn-primary"
-                        disabled={selectedItemIds.size === 0 && currentBillItems.some((i) => !i.claimed_by || i.claimed_by === member.id)}
+                        disabled={selectedItemIds.size === 0}
                         onClick={() => setItemizedConfirmed(true)}
                         style={{ marginTop: 16 }}
                       >

@@ -72,6 +72,7 @@ export default function PayeeView({ bill, members, paymentMethods, billItems: in
     .filter((i) => selectedItemIds.has(i.id))
     .reduce((s, i) => s + i.amount, 0);
   const itemizedTotal = itemizedAmount + scPerPerson;
+  const allItemsTaken = isItemized && currentBillItems.length > 0 && currentBillItems.every((i) => i.claimed_by && i.claimed_by !== selectedMemberId);
 
   const selectedMember = members.find((m) => m.id === selectedMemberId) ?? null;
 
@@ -161,7 +162,7 @@ export default function PayeeView({ bill, members, paymentMethods, billItems: in
     );
   }
 
-  const showPaymentSection = (!isHonesty && !isItemized) || hasClaimed || honestyConfirmed || itemizedConfirmed;
+  const showPaymentSection = (!isHonesty && !isItemized) || hasClaimed || honestyConfirmed || itemizedConfirmed || allItemsTaken;
 
   return (
     <main className="pay-page">
@@ -212,7 +213,7 @@ export default function PayeeView({ bill, members, paymentMethods, billItems: in
                 <ReceiptThumbnail src={bill.receipt_url} onClick={() => setReceiptOpen(true)} />
               )}
 
-              {!itemizedConfirmed ? (
+              {!itemizedConfirmed && !allItemsTaken ? (
                 <div className="share-card">
                   <p className="share-card-label">Select your items</p>
                   <div className="itemized-list">
@@ -243,7 +244,7 @@ export default function PayeeView({ bill, members, paymentMethods, billItems: in
                   <button
                     type="button"
                     className="btn-primary"
-                    disabled={selectedItemIds.size === 0 && currentBillItems.some((i) => !i.claimed_by || i.claimed_by === selectedMember.id)}
+                    disabled={selectedItemIds.size === 0}
                     onClick={() => setItemizedConfirmed(true)}
                     style={{ marginTop: 16 }}
                   >
