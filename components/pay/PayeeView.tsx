@@ -1,16 +1,21 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Bill, BillItem, Member, PaymentMethod } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils/currency";
 import { calcScPerPerson } from "@/lib/utils/split";
 import { getAvatarColor, getInitial } from "@/lib/utils/avatars";
+import { submitClaim } from "@/lib/utils/claim";
+import { useProofUpload } from "@/lib/hooks/useProofUpload";
+import { triggerPaymentCelebration } from "@/lib/utils/celebration";
 import Modal from "@/components/ui/Modal";
 import Toast from "@/components/ui/Toast";
 import PaymentMethodCard from "@/components/pay/PaymentMethodCard";
 import QrModal from "@/components/pay/QrModal";
-import { compressImage } from "@/lib/utils/image";
-import { triggerPaymentCelebration } from "@/lib/utils/celebration";
+import ReceiptThumbnail from "@/components/pay/ReceiptThumbnail";
+import AmountSummary from "@/components/pay/AmountSummary";
+import ItemizedItemCard from "@/components/pay/ItemizedItemCard";
+import ProofUploadButton from "@/components/pay/ProofUploadButton";
 
 interface PayeeViewProps {
   bill: Bill;
@@ -24,7 +29,6 @@ const STORAGE_KEY = (billId: string) => `singil:claim:${billId}`;
 export default function PayeeView({ bill, members, paymentMethods, billItems: initialBillItems = [] }: PayeeViewProps) {
   const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
 
-  // Restore claimed member from localStorage after mount (avoids SSR mismatch)
   useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY(bill.id));
@@ -34,10 +38,9 @@ export default function PayeeView({ bill, members, paymentMethods, billItems: in
     } catch {}
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   const [claiming, setClaiming] = useState(false);
   const [claimedIds, setClaimedIds] = useState<Set<string>>(new Set());
-  const [proofFile, setProofFile] = useState<File | null>(null);
-  const [proofPreview, setProofPreview] = useState<string | null>(null);
   const [proofUrl, setProofUrl] = useState<string | null>(null);
   const [receiptOpen, setReceiptOpen] = useState(false);
   const [proofOpen, setProofOpen] = useState(false);
@@ -49,17 +52,16 @@ export default function PayeeView({ bill, members, paymentMethods, billItems: in
   const [itemizedConfirmed, setItemizedConfirmed] = useState(false);
   const [currentBillItems, setCurrentBillItems] = useState<BillItem[]>(initialBillItems);
   const [popping, setPopping] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { proofFile, proofPreview, fileInputRef, handleProofSelect, resetProof } = useProofUpload();
 
   useEffect(() => {
     setHonestyItems([0]);
     setHonestyConfirmed(false);
     setSelectedItemIds(new Set());
     setItemizedConfirmed(false);
-    setProofFile(null);
-    setProofPreview(null);
+    resetProof();
     setProofUrl(null);
-  }, [selectedMemberId]);
+  }, [selectedMemberId, resetProof]);
 
   const isHonesty = bill.split_mode === "honesty";
   const isItemized = bill.split_mode === "itemized";
@@ -79,68 +81,34 @@ export default function PayeeView({ bill, members, paymentMethods, billItems: in
     year: "numeric",
   });
 
-  async function handleProofSelect(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setProofPreview(URL.createObjectURL(file));
-    const compressed = await compressImage(file);
-    setProofFile(compressed);
-  }
-
   async function handleClaim() {
     if (!selectedMember || claiming) return;
     setClaiming(true);
     try {
-      let res: Response;
+      const result = await submitClaim({
+        memberId: selectedMember.id,
+        isItemized,
+        isHonesty,
+        selectedItemIds,
+        honestyAmount,
+        proofFile,
+      });
 
-      if (isItemized) {
-        const endpoint = `/api/members/${selectedMember.id}/claim-items`;
-        if (proofFile) {
-          const formData = new FormData();
-          formData.append("file", proofFile);
-          formData.append("itemIds", JSON.stringify([...selectedItemIds]));
-          res = await fetch(endpoint, { method: "POST", body: formData });
-        } else {
-          res = await fetch(endpoint, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ itemIds: [...selectedItemIds] }),
-          });
-        }
-      } else if (proofFile) {
-        const formData = new FormData();
-        formData.append("file", proofFile);
-        if (isHonesty) formData.append("amount", String(honestyAmount));
-        res = await fetch(`/api/members/${selectedMember.id}/claim`, {
-          method: "POST",
-          body: formData,
-        });
-      } else {
-        res = await fetch(`/api/members/${selectedMember.id}/claim`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(isHonesty ? { amount: honestyAmount } : {}),
-        });
-      }
-
-      if (res.ok) {
-        const data = await res.json();
+      if (result.ok) {
         setClaimedIds((prev) => new Set(prev).add(selectedMember.id));
-        if (data.proof_url) setProofUrl(data.proof_url);
+        if (result.data.proof_url) setProofUrl(result.data.proof_url as string);
         triggerPaymentCelebration();
         setPopping(true);
         setTimeout(() => setPopping(false), 400);
         setToastMsg("Payment sent!");
         try { localStorage.setItem(STORAGE_KEY(bill.id), selectedMember.id); } catch {}
-      } else if (res.status === 409) {
-        const data = await res.json().catch(() => ({}));
-        if (data.items) setCurrentBillItems(data.items);
+      } else if (result.status === 409) {
+        if (result.data.items) setCurrentBillItems(result.data.items as BillItem[]);
         setSelectedItemIds(new Set());
         setItemizedConfirmed(false);
-        setToastMsg(data.error ?? "Some items were already claimed. Please re-select.");
+        setToastMsg((result.data.error as string) ?? "Some items were already claimed. Please re-select.");
       } else {
-        const data = await res.json().catch(() => ({}));
-        setToastMsg(data.error ?? "Something went wrong. Please try again.");
+        setToastMsg((result.data.error as string) ?? "Something went wrong. Please try again.");
       }
     } catch {
       setToastMsg("Network error. Please check your connection.");
@@ -158,6 +126,15 @@ export default function PayeeView({ bill, members, paymentMethods, billItems: in
     const rounded = Math.round(amount * 100) / 100;
     await navigator.clipboard.writeText(String(rounded));
     setToastMsg("Amount copied!");
+  }
+
+  function toggleItem(itemId: string) {
+    setSelectedItemIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(itemId)) next.delete(itemId);
+      else next.add(itemId);
+      return next;
+    });
   }
 
   const hasClaimed = selectedMember
@@ -184,7 +161,6 @@ export default function PayeeView({ bill, members, paymentMethods, billItems: in
     );
   }
 
-  // Whether to show payment methods + claim CTA
   const showPaymentSection = (!isHonesty && !isItemized) || hasClaimed || honestyConfirmed || itemizedConfirmed;
 
   return (
@@ -230,19 +206,10 @@ export default function PayeeView({ bill, members, paymentMethods, billItems: in
             </button>
           )}
 
-          {/* Itemized mode: two-step — item selection then review */}
           {isItemized && !hasClaimed ? (
             <>
               {bill.receipt_url && (
-                <button
-                  className="honesty-receipt-btn"
-                  onClick={() => setReceiptOpen(true)}
-                  aria-label="View receipt"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={bill.receipt_url} alt="Receipt" className="honesty-receipt-img" />
-                  <span className="honesty-receipt-overlay">🔍 Tap to expand</span>
-                </button>
+                <ReceiptThumbnail src={bill.receipt_url} onClick={() => setReceiptOpen(true)} />
               )}
 
               {!itemizedConfirmed ? (
@@ -250,55 +217,28 @@ export default function PayeeView({ bill, members, paymentMethods, billItems: in
                   <p className="share-card-label">Select your items</p>
                   <div className="itemized-list">
                     {currentBillItems.map((item) => {
-                      const isSelected = selectedItemIds.has(item.id);
-                      const claimedByOther = item.claimed_by && item.claimed_by !== selectedMember?.id;
+                      const claimedByOther = item.claimed_by && item.claimed_by !== selectedMember.id;
                       const claimerName = claimedByOther
                         ? members.find((m) => m.id === item.claimed_by)?.name ?? "Someone"
                         : null;
-
                       return (
-                        <button
+                        <ItemizedItemCard
                           key={item.id}
-                          type="button"
-                          className={`itemized-item${isSelected ? " selected" : ""}${claimedByOther ? " claimed" : ""}`}
-                          onClick={() => {
-                            if (claimedByOther) return;
-                            setSelectedItemIds((prev) => {
-                              const next = new Set(prev);
-                              if (next.has(item.id)) next.delete(item.id);
-                              else next.add(item.id);
-                              return next;
-                            });
-                          }}
-                          disabled={!!claimedByOther}
-                        >
-                          <span className="itemized-check">{isSelected ? "✓" : ""}</span>
-                          <span className="itemized-item-name">{item.name}</span>
-                          <span className="itemized-item-amount">{formatCurrency(item.amount)}</span>
-                          {claimerName && (
-                            <span className="itemized-item-claimed-by">{claimerName}</span>
-                          )}
-                        </button>
+                          name={item.name}
+                          amount={item.amount}
+                          isSelected={selectedItemIds.has(item.id)}
+                          claimerName={claimerName}
+                          onToggle={() => toggleItem(item.id)}
+                        />
                       );
                     })}
                   </div>
                   {itemizedAmount > 0 && (
-                    <div className="honesty-summary">
-                      <div className="honesty-summary-row">
-                        <span>Subtotal ({selectedItemIds.size} {selectedItemIds.size === 1 ? "item" : "items"})</span>
-                        <span>{formatCurrency(itemizedAmount)}</span>
-                      </div>
-                      {scPerPerson > 0 && (
-                        <div className="honesty-summary-row sc">
-                          <span>SC (split equally)</span>
-                          <span>+{formatCurrency(scPerPerson)}</span>
-                        </div>
-                      )}
-                      <div className="honesty-summary-row total">
-                        <span>Total</span>
-                        <span>{formatCurrency(itemizedTotal)}</span>
-                      </div>
-                    </div>
+                    <AmountSummary
+                      lines={[{ label: `Subtotal (${selectedItemIds.size} ${selectedItemIds.size === 1 ? "item" : "items"})`, amount: itemizedAmount }]}
+                      scPerPerson={scPerPerson}
+                      total={{ label: "Total", amount: itemizedTotal }}
+                    />
                   )}
                   <button
                     type="button"
@@ -321,45 +261,26 @@ export default function PayeeView({ bill, members, paymentMethods, billItems: in
                   </button>
                   <p className="share-card-label">Your total</p>
                   <p className="share-amount">{formatCurrency(itemizedTotal)}</p>
-                  <div className="honesty-summary" style={{ marginBottom: 12 }}>
-                    {currentBillItems
+                  <AmountSummary
+                    lines={currentBillItems
                       .filter((i) => selectedItemIds.has(i.id))
-                      .map((i) => (
-                        <div key={i.id} className="honesty-summary-row">
-                          <span>{i.name}</span>
-                          <span>{formatCurrency(i.amount)}</span>
-                        </div>
-                      ))}
-                    {scPerPerson > 0 && (
-                      <div className="honesty-summary-row sc">
-                        <span>SC (split equally)</span>
-                        <span>+{formatCurrency(scPerPerson)}</span>
-                      </div>
-                    )}
-                  </div>
+                      .map((i) => ({ label: i.name, amount: i.amount }))}
+                    scPerPerson={scPerPerson}
+                    style={{ marginBottom: 12 }}
+                  />
                   <button className="share-copy-btn" onClick={handleCopyAmount}>
                     Copy amount
                   </button>
                 </div>
               )}
             </>
-          ) : /* Honesty mode: two-step — item entry then review */
-          isHonesty && !hasClaimed ? (
+          ) : isHonesty && !hasClaimed ? (
             <>
               {bill.receipt_url && (
-                <button
-                  className="honesty-receipt-btn"
-                  onClick={() => setReceiptOpen(true)}
-                  aria-label="View receipt"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={bill.receipt_url} alt="Receipt" className="honesty-receipt-img" />
-                  <span className="honesty-receipt-overlay">🔍 Tap to expand</span>
-                </button>
+                <ReceiptThumbnail src={bill.receipt_url} onClick={() => setReceiptOpen(true)} />
               )}
 
               {!honestyConfirmed ? (
-                /* Step 1: item entry */
                 <div className="share-card">
                   <p className="share-card-label">Your items</p>
                   <div className="honesty-items-list">
@@ -404,22 +325,11 @@ export default function PayeeView({ bill, members, paymentMethods, billItems: in
                     + Add item
                   </button>
                   {honestyAmount > 0 && (
-                    <div className="honesty-summary">
-                      <div className="honesty-summary-row">
-                        <span>Subtotal</span>
-                        <span>{formatCurrency(honestyAmount)}</span>
-                      </div>
-                      {scPerPerson > 0 && (
-                        <div className="honesty-summary-row sc">
-                          <span>SC (split equally)</span>
-                          <span>+{formatCurrency(scPerPerson)}</span>
-                        </div>
-                      )}
-                      <div className="honesty-summary-row total">
-                        <span>Total</span>
-                        <span>{formatCurrency(honestyTotal)}</span>
-                      </div>
-                    </div>
+                    <AmountSummary
+                      lines={[{ label: "Subtotal", amount: honestyAmount }]}
+                      scPerPerson={scPerPerson}
+                      total={{ label: "Total", amount: honestyTotal }}
+                    />
                   )}
                   <button
                     type="button"
@@ -432,7 +342,6 @@ export default function PayeeView({ bill, members, paymentMethods, billItems: in
                   </button>
                 </div>
               ) : (
-                /* Step 2: review summary */
                 <div className="share-card">
                   <button
                     className="pay-back-btn"
@@ -443,18 +352,11 @@ export default function PayeeView({ bill, members, paymentMethods, billItems: in
                   </button>
                   <p className="share-card-label">Your total</p>
                   <p className="share-amount">{formatCurrency(honestyTotal)}</p>
-                  <div className="honesty-summary" style={{ marginBottom: 12 }}>
-                    <div className="honesty-summary-row">
-                      <span>Subtotal</span>
-                      <span>{formatCurrency(honestyAmount)}</span>
-                    </div>
-                    {scPerPerson > 0 && (
-                      <div className="honesty-summary-row sc">
-                        <span>SC (split equally)</span>
-                        <span>+{formatCurrency(scPerPerson)}</span>
-                      </div>
-                    )}
-                  </div>
+                  <AmountSummary
+                    lines={[{ label: "Subtotal", amount: honestyAmount }]}
+                    scPerPerson={scPerPerson}
+                    style={{ marginBottom: 12 }}
+                  />
                   <button className="share-copy-btn" onClick={handleCopyAmount}>
                     Copy amount
                   </button>
@@ -462,7 +364,6 @@ export default function PayeeView({ bill, members, paymentMethods, billItems: in
               )}
             </>
           ) : (
-            /* Equal mode, or post-claim honesty/itemized */
             <>
               <div className="share-card">
                 <p className="share-card-label">Your share</p>
@@ -491,7 +392,6 @@ export default function PayeeView({ bill, members, paymentMethods, billItems: in
             </>
           )}
 
-          {/* Payment methods + CTA — hidden during honesty item entry step */}
           {showPaymentSection && (
             <>
               <p className="section-label" style={{ marginTop: 20 }}>Pay via</p>
@@ -527,30 +427,11 @@ export default function PayeeView({ bill, members, paymentMethods, billItems: in
                   </>
                 ) : (
                   <>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp"
-                      style={{ display: "none" }}
-                      onChange={handleProofSelect}
+                    <ProofUploadButton
+                      proofPreview={proofPreview}
+                      fileInputRef={fileInputRef}
+                      onSelect={handleProofSelect}
                     />
-                    {proofPreview ? (
-                      <button
-                        className="proof-attach-btn has-proof"
-                        onClick={() => fileInputRef.current?.click()}
-                      >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={proofPreview} alt="Proof preview" className="proof-preview-thumb" />
-                        <span>Change proof</span>
-                      </button>
-                    ) : (
-                      <button
-                        className="proof-attach-btn"
-                        onClick={() => fileInputRef.current?.click()}
-                      >
-                        📎 Attach payment proof (optional)
-                      </button>
-                    )}
                     <button
                       className={`btn-claim${popping ? " pop" : ""}`}
                       onClick={handleClaim}
