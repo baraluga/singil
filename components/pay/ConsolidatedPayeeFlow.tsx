@@ -42,7 +42,10 @@ export default function ConsolidatedPayeeFlow({
     if (bill.split_mode === "honesty") initialItems[bill.id] = [0];
   }
   const [billItems, setBillItems] = useState<Record<string, number[]>>(initialItems);
-  const [phase, setPhase] = useState<"items" | "payment">("items");
+  const hasHonestyBills = unpaidBills.some((b) => b.split_mode === "honesty");
+  const [phase, setPhase] = useState<"items" | "payment">(
+    hasHonestyBills ? "items" : "payment"
+  );
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [proofPreview, setProofPreview] = useState<string | null>(null);
   const [claiming, setClaiming] = useState(false);
@@ -277,13 +280,15 @@ export default function ConsolidatedPayeeFlow({
       ) : (
         /* ── Phase 2: Payment ────────────────────────────────────────── */
         <>
-          <button
-            className="pay-back-btn"
-            style={{ marginBottom: 12 }}
-            onClick={() => setPhase("items")}
-          >
-            ← Edit items
-          </button>
+          {hasHonestyBills && (
+            <button
+              className="pay-back-btn"
+              style={{ marginBottom: 12 }}
+              onClick={() => setPhase("items")}
+            >
+              ← Edit items
+            </button>
+          )}
 
           {/* Per-bill summary */}
           <div className="share-card">
