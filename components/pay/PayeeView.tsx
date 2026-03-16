@@ -40,7 +40,6 @@ export default function PayeeView({ bill, members, paymentMethods, billItems: in
   }, []);
 
   const [claiming, setClaiming] = useState(false);
-  const [confirmPending, setConfirmPending] = useState(false);
   const [claimedIds, setClaimedIds] = useState<Set<string>>(new Set());
   const [proofUrl, setProofUrl] = useState<string | null>(null);
   const [receiptOpen, setReceiptOpen] = useState(false);
@@ -432,31 +431,15 @@ export default function PayeeView({ bill, members, paymentMethods, billItems: in
                       fileInputRef={fileInputRef}
                       onSelect={handleProofSelect}
                     />
-                    {confirmPending ? (
-                      <div className="claim-confirm">
-                        <span className="claim-confirm-label">Sure ka?</span>
-                        <div className="claim-confirm-actions">
-                          <button className="claim-confirm-yes" onClick={handleClaim} disabled={claiming}>
-                            {claiming ? "Sending..." : "Yes!"}
-                          </button>
-                          <button className="claim-confirm-cancel" onClick={() => setConfirmPending(false)}>
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <>
-                        <button
-                          className={`btn-claim${popping ? " pop" : ""}`}
-                          onClick={() => setConfirmPending(true)}
-                          disabled={!proofFile}
-                          style={{ marginTop: 10 }}
-                        >
-                          Bayad na ako!
-                        </button>
-                        {!proofFile && <p className="proof-required-hint">Attach proof to continue</p>}
-                      </>
-                    )}
+                    <button
+                      className={`btn-claim${popping ? " pop" : ""}`}
+                      onClick={handleClaim}
+                      disabled={!proofFile || claiming}
+                      style={{ marginTop: 10 }}
+                    >
+                      {claiming ? "Sending..." : "Bayad na ako!"}
+                    </button>
+                    {!proofFile && <p className="proof-required-hint">Attach proof to continue</p>}
                   </>
                 )}
               </div>
