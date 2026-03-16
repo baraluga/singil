@@ -32,6 +32,11 @@ export default async function BillDetailPage({ params }: { params: Promise<{ id:
   const collected = memberList.reduce((sum, m) => sum + (m.share_amount > 0 ? m.share_amount : 0), 0);
   const myShare = bill.total_amount - collected;
 
+  const { data: billItems } = bill.split_mode === "itemized"
+    ? await supabaseAdmin.from("bill_items").select("*").eq("bill_id", id).order("created_at")
+    : { data: [] };
+  const itemsList = billItems ?? [];
+
   const date = new Date(bill.date).toLocaleDateString("en-PH", {
     month: "long",
     day: "numeric",
@@ -71,6 +76,28 @@ export default async function BillDetailPage({ params }: { params: Promise<{ id:
 
       <div className="page-inner" style={{ padding: "0 20px" }}>
         <ShareButtons billId={bill.id} billName={bill.name} />
+
+        {itemsList.length > 0 && (
+          <>
+            <div className="section-label">Items</div>
+            <div className="bill-items-list">
+              {itemsList.map((item) => {
+                const claimer = item.claimed_by
+                  ? memberList.find((m) => m.id === item.claimed_by)
+                  : null;
+                return (
+                  <div key={item.id} className="bill-item-row">
+                    <span className="bill-item-name">{item.name}</span>
+                    <span className="bill-item-amount">{formatCurrency(item.amount)}</span>
+                    <span className={`bill-item-status${claimer ? " claimed" : ""}`}>
+                      {claimer ? claimer.name : "unclaimed"}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
 
         <div className="section-label">Members</div>
 

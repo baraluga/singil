@@ -1,35 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { Collection, BillWithMembers, Member, PaymentMethod } from "@/lib/types";
+import { Collection, BillWithMembers, PaymentMethod } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils/currency";
 import { getAvatarColor, getInitial } from "@/lib/utils/avatars";
+import { findMemberByName, extractUniqueNames } from "@/lib/utils/members";
 import ConsolidatedPayeeFlow from "@/components/pay/ConsolidatedPayeeFlow";
 
 interface CollectionPayeeViewProps {
   collection: Collection;
   bills: BillWithMembers[];
   paymentMethods: PaymentMethod[];
-}
-
-function findMemberByName(name: string, bill: BillWithMembers): Member | null {
-  return (
-    bill.members.find(
-      (m) => m.name.toLowerCase().trim() === name.toLowerCase().trim()
-    ) ?? null
-  );
-}
-
-/** Unique display names across all bills (preserves first-seen casing) */
-function extractUniqueNames(bills: BillWithMembers[]): string[] {
-  const seen = new Map<string, string>();
-  for (const bill of bills) {
-    for (const member of bill.members) {
-      const key = member.name.toLowerCase().trim();
-      if (!seen.has(key)) seen.set(key, member.name.trim());
-    }
-  }
-  return Array.from(seen.values());
 }
 
 export default function CollectionPayeeView({

@@ -24,8 +24,18 @@ export interface Member {
   updated_at: string;
 }
 
+export interface BillItem {
+  id: string;
+  bill_id: string;
+  name: string;
+  amount: number;
+  claimed_by: string | null;
+  created_at: string;
+}
+
 export interface BillWithMembers extends Bill {
   members: Member[];
+  items?: BillItem[];
 }
 
 export interface MemberInput {
@@ -34,7 +44,13 @@ export interface MemberInput {
   amount: number;
 }
 
-export type SplitMode = "equal" | "honesty";
+export interface BillItemInput {
+  tempId: string;
+  name: string;
+  amount: number;
+}
+
+export type SplitMode = "equal" | "honesty" | "itemized";
 
 export interface Collection {
   id: string;

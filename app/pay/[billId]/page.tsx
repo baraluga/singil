@@ -17,11 +17,16 @@ export default async function PayPage({ params }: { params: Promise<{ billId: st
 
   if (!bill) notFound();
 
+  const { data: billItems } = bill.split_mode === "itemized"
+    ? await supabaseAdmin.from("bill_items").select("*").eq("bill_id", billId).order("created_at")
+    : { data: [] };
+
   return (
     <PayeeView
       bill={bill}
       members={members ?? []}
       paymentMethods={paymentMethods ?? []}
+      billItems={billItems ?? []}
     />
   );
 }

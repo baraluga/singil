@@ -1,29 +1,34 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Bill, Member, PaymentMethod } from "@/lib/types";
+import { useEffect, useState } from "react";
+import { Bill, BillItem, Member, PaymentMethod } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils/currency";
 import { calcScPerPerson } from "@/lib/utils/split";
 import { getAvatarColor, getInitial } from "@/lib/utils/avatars";
+import { submitClaim } from "@/lib/utils/claim";
+import { useProofUpload } from "@/lib/hooks/useProofUpload";
+import { triggerPaymentCelebration } from "@/lib/utils/celebration";
 import Modal from "@/components/ui/Modal";
 import Toast from "@/components/ui/Toast";
 import PaymentMethodCard from "@/components/pay/PaymentMethodCard";
 import QrModal from "@/components/pay/QrModal";
-import { compressImage } from "@/lib/utils/image";
-import { triggerPaymentCelebration } from "@/lib/utils/celebration";
+import ReceiptThumbnail from "@/components/pay/ReceiptThumbnail";
+import AmountSummary from "@/components/pay/AmountSummary";
+import ItemizedItemCard from "@/components/pay/ItemizedItemCard";
+import ProofUploadButton from "@/components/pay/ProofUploadButton";
 
 interface PayeeViewProps {
   bill: Bill;
   members: Member[];
   paymentMethods: PaymentMethod[];
+  billItems?: BillItem[];
 }
 
 const STORAGE_KEY = (billId: string) => `singil:claim:${billId}`;
 
-export default function PayeeView({ bill, members, paymentMethods }: PayeeViewProps) {
+export default function PayeeView({ bill, members, paymentMethods, billItems: initialBillItems = [] }: PayeeViewProps) {
   const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
 
-  // Restore claimed member from localStorage after mount (avoids SSR mismatch)
   useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY(bill.id));
@@ -33,10 +38,9 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
     } catch {}
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   const [claiming, setClaiming] = useState(false);
   const [claimedIds, setClaimedIds] = useState<Set<string>>(new Set());
-  const [proofFile, setProofFile] = useState<File | null>(null);
-  const [proofPreview, setProofPreview] = useState<string | null>(null);
   const [proofUrl, setProofUrl] = useState<string | null>(null);
   const [receiptOpen, setReceiptOpen] = useState(false);
   const [proofOpen, setProofOpen] = useState(false);
@@ -44,21 +48,30 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [honestyItems, setHonestyItems] = useState<number[]>([0]);
   const [honestyConfirmed, setHonestyConfirmed] = useState(false);
+  const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(new Set());
+  const [itemizedConfirmed, setItemizedConfirmed] = useState(false);
+  const [currentBillItems, setCurrentBillItems] = useState<BillItem[]>(initialBillItems);
   const [popping, setPopping] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { proofFile, proofPreview, fileInputRef, handleProofSelect, resetProof } = useProofUpload();
 
   useEffect(() => {
     setHonestyItems([0]);
     setHonestyConfirmed(false);
-    setProofFile(null);
-    setProofPreview(null);
+    setSelectedItemIds(new Set());
+    setItemizedConfirmed(false);
+    resetProof();
     setProofUrl(null);
-  }, [selectedMemberId]);
+  }, [selectedMemberId, resetProof]);
 
   const isHonesty = bill.split_mode === "honesty";
+  const isItemized = bill.split_mode === "itemized";
   const honestyAmount = honestyItems.reduce((s, v) => s + v, 0);
   const scPerPerson = calcScPerPerson(bill.service_charge_amount, members.length);
   const honestyTotal = honestyAmount + scPerPerson;
+  const itemizedAmount = currentBillItems
+    .filter((i) => selectedItemIds.has(i.id))
+    .reduce((s, i) => s + i.amount, 0);
+  const itemizedTotal = itemizedAmount + scPerPerson;
 
   const selectedMember = members.find((m) => m.id === selectedMemberId) ?? null;
 
@@ -68,46 +81,34 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
     year: "numeric",
   });
 
-  async function handleProofSelect(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setProofPreview(URL.createObjectURL(file));
-    const compressed = await compressImage(file);
-    setProofFile(compressed);
-  }
-
   async function handleClaim() {
     if (!selectedMember || claiming) return;
     setClaiming(true);
     try {
-      let res: Response;
-      if (proofFile) {
-        const formData = new FormData();
-        formData.append("file", proofFile);
-        if (isHonesty) formData.append("amount", String(honestyAmount));
-        res = await fetch(`/api/members/${selectedMember.id}/claim`, {
-          method: "POST",
-          body: formData,
-        });
-      } else {
-        res = await fetch(`/api/members/${selectedMember.id}/claim`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(isHonesty ? { amount: honestyAmount } : {}),
-        });
-      }
-      if (res.ok) {
-        const data = await res.json();
+      const result = await submitClaim({
+        memberId: selectedMember.id,
+        isItemized,
+        isHonesty,
+        selectedItemIds,
+        honestyAmount,
+        proofFile,
+      });
+
+      if (result.ok) {
         setClaimedIds((prev) => new Set(prev).add(selectedMember.id));
-        if (data.proof_url) setProofUrl(data.proof_url);
+        if (result.data.proof_url) setProofUrl(result.data.proof_url as string);
         triggerPaymentCelebration();
         setPopping(true);
         setTimeout(() => setPopping(false), 400);
         setToastMsg("Payment sent!");
         try { localStorage.setItem(STORAGE_KEY(bill.id), selectedMember.id); } catch {}
+      } else if (result.status === 409) {
+        if (result.data.items) setCurrentBillItems(result.data.items as BillItem[]);
+        setSelectedItemIds(new Set());
+        setItemizedConfirmed(false);
+        setToastMsg((result.data.error as string) ?? "Some items were already claimed. Please re-select.");
       } else {
-        const data = await res.json().catch(() => ({}));
-        setToastMsg(data.error ?? "Something went wrong. Please try again.");
+        setToastMsg((result.data.error as string) ?? "Something went wrong. Please try again.");
       }
     } catch {
       setToastMsg("Network error. Please check your connection.");
@@ -118,10 +119,22 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
 
   async function handleCopyAmount() {
     if (!selectedMember) return;
-    const amount = isHonesty && selectedMember.share_amount === 0 ? honestyTotal : selectedMember.share_amount;
+    let amount: number;
+    if (isItemized && selectedMember.share_amount === 0) amount = itemizedTotal;
+    else if (isHonesty && selectedMember.share_amount === 0) amount = honestyTotal;
+    else amount = selectedMember.share_amount;
     const rounded = Math.round(amount * 100) / 100;
     await navigator.clipboard.writeText(String(rounded));
     setToastMsg("Amount copied!");
+  }
+
+  function toggleItem(itemId: string) {
+    setSelectedItemIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(itemId)) next.delete(itemId);
+      else next.add(itemId);
+      return next;
+    });
   }
 
   const hasClaimed = selectedMember
@@ -148,8 +161,7 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
     );
   }
 
-  // Whether to show payment methods + claim CTA
-  const showPaymentSection = !isHonesty || hasClaimed || honestyConfirmed;
+  const showPaymentSection = (!isHonesty && !isItemized) || hasClaimed || honestyConfirmed || itemizedConfirmed;
 
   return (
     <main className="pay-page">
@@ -194,23 +206,81 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
             </button>
           )}
 
-          {/* Honesty mode: two-step — item entry then review */}
-          {isHonesty && !hasClaimed ? (
+          {isItemized && !hasClaimed ? (
             <>
               {bill.receipt_url && (
-                <button
-                  className="honesty-receipt-btn"
-                  onClick={() => setReceiptOpen(true)}
-                  aria-label="View receipt"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={bill.receipt_url} alt="Receipt" className="honesty-receipt-img" />
-                  <span className="honesty-receipt-overlay">🔍 Tap to expand</span>
-                </button>
+                <ReceiptThumbnail src={bill.receipt_url} onClick={() => setReceiptOpen(true)} />
+              )}
+
+              {!itemizedConfirmed ? (
+                <div className="share-card">
+                  <p className="share-card-label">Select your items</p>
+                  <div className="itemized-list">
+                    {currentBillItems.map((item) => {
+                      const claimedByOther = item.claimed_by && item.claimed_by !== selectedMember.id;
+                      const claimerName = claimedByOther
+                        ? members.find((m) => m.id === item.claimed_by)?.name ?? "Someone"
+                        : null;
+                      return (
+                        <ItemizedItemCard
+                          key={item.id}
+                          name={item.name}
+                          amount={item.amount}
+                          isSelected={selectedItemIds.has(item.id)}
+                          claimerName={claimerName}
+                          onToggle={() => toggleItem(item.id)}
+                        />
+                      );
+                    })}
+                  </div>
+                  {itemizedAmount > 0 && (
+                    <AmountSummary
+                      lines={[{ label: `Subtotal (${selectedItemIds.size} ${selectedItemIds.size === 1 ? "item" : "items"})`, amount: itemizedAmount }]}
+                      scPerPerson={scPerPerson}
+                      total={{ label: "Total", amount: itemizedTotal }}
+                    />
+                  )}
+                  <button
+                    type="button"
+                    className="btn-primary"
+                    disabled={selectedItemIds.size === 0}
+                    onClick={() => setItemizedConfirmed(true)}
+                    style={{ marginTop: 16 }}
+                  >
+                    Confirm selection →
+                  </button>
+                </div>
+              ) : (
+                <div className="share-card">
+                  <button
+                    className="pay-back-btn"
+                    style={{ marginBottom: 12 }}
+                    onClick={() => setItemizedConfirmed(false)}
+                  >
+                    ← Edit selection
+                  </button>
+                  <p className="share-card-label">Your total</p>
+                  <p className="share-amount">{formatCurrency(itemizedTotal)}</p>
+                  <AmountSummary
+                    lines={currentBillItems
+                      .filter((i) => selectedItemIds.has(i.id))
+                      .map((i) => ({ label: i.name, amount: i.amount }))}
+                    scPerPerson={scPerPerson}
+                    style={{ marginBottom: 12 }}
+                  />
+                  <button className="share-copy-btn" onClick={handleCopyAmount}>
+                    Copy amount
+                  </button>
+                </div>
+              )}
+            </>
+          ) : isHonesty && !hasClaimed ? (
+            <>
+              {bill.receipt_url && (
+                <ReceiptThumbnail src={bill.receipt_url} onClick={() => setReceiptOpen(true)} />
               )}
 
               {!honestyConfirmed ? (
-                /* Step 1: item entry */
                 <div className="share-card">
                   <p className="share-card-label">Your items</p>
                   <div className="honesty-items-list">
@@ -255,22 +325,11 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
                     + Add item
                   </button>
                   {honestyAmount > 0 && (
-                    <div className="honesty-summary">
-                      <div className="honesty-summary-row">
-                        <span>Subtotal</span>
-                        <span>{formatCurrency(honestyAmount)}</span>
-                      </div>
-                      {scPerPerson > 0 && (
-                        <div className="honesty-summary-row sc">
-                          <span>SC (split equally)</span>
-                          <span>+{formatCurrency(scPerPerson)}</span>
-                        </div>
-                      )}
-                      <div className="honesty-summary-row total">
-                        <span>Total</span>
-                        <span>{formatCurrency(honestyTotal)}</span>
-                      </div>
-                    </div>
+                    <AmountSummary
+                      lines={[{ label: "Subtotal", amount: honestyAmount }]}
+                      scPerPerson={scPerPerson}
+                      total={{ label: "Total", amount: honestyTotal }}
+                    />
                   )}
                   <button
                     type="button"
@@ -283,7 +342,6 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
                   </button>
                 </div>
               ) : (
-                /* Step 2: review summary */
                 <div className="share-card">
                   <button
                     className="pay-back-btn"
@@ -294,18 +352,11 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
                   </button>
                   <p className="share-card-label">Your total</p>
                   <p className="share-amount">{formatCurrency(honestyTotal)}</p>
-                  <div className="honesty-summary" style={{ marginBottom: 12 }}>
-                    <div className="honesty-summary-row">
-                      <span>Subtotal</span>
-                      <span>{formatCurrency(honestyAmount)}</span>
-                    </div>
-                    {scPerPerson > 0 && (
-                      <div className="honesty-summary-row sc">
-                        <span>SC (split equally)</span>
-                        <span>+{formatCurrency(scPerPerson)}</span>
-                      </div>
-                    )}
-                  </div>
+                  <AmountSummary
+                    lines={[{ label: "Subtotal", amount: honestyAmount }]}
+                    scPerPerson={scPerPerson}
+                    style={{ marginBottom: 12 }}
+                  />
                   <button className="share-copy-btn" onClick={handleCopyAmount}>
                     Copy amount
                   </button>
@@ -313,13 +364,14 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
               )}
             </>
           ) : (
-            /* Equal mode, or post-claim honesty */
             <>
               <div className="share-card">
                 <p className="share-card-label">Your share</p>
-                <p className="share-amount">{formatCurrency(isHonesty ? honestyTotal : selectedMember.share_amount)}</p>
+                <p className="share-amount">{formatCurrency(
+                  isHonesty ? honestyTotal : isItemized ? itemizedTotal : selectedMember.share_amount
+                )}</p>
                 {scPerPerson > 0 && (() => {
-                  const amount = isHonesty ? honestyTotal : selectedMember.share_amount;
+                  const amount = isHonesty ? honestyTotal : isItemized ? itemizedTotal : selectedMember.share_amount;
                   const food = amount - scPerPerson;
                   return (
                     <p className="share-breakdown">
@@ -340,7 +392,6 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
             </>
           )}
 
-          {/* Payment methods + CTA — hidden during honesty item entry step */}
           {showPaymentSection && (
             <>
               <p className="section-label" style={{ marginTop: 20 }}>Pay via</p>
@@ -376,30 +427,11 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
                   </>
                 ) : (
                   <>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp"
-                      style={{ display: "none" }}
-                      onChange={handleProofSelect}
+                    <ProofUploadButton
+                      proofPreview={proofPreview}
+                      fileInputRef={fileInputRef}
+                      onSelect={handleProofSelect}
                     />
-                    {proofPreview ? (
-                      <button
-                        className="proof-attach-btn has-proof"
-                        onClick={() => fileInputRef.current?.click()}
-                      >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={proofPreview} alt="Proof preview" className="proof-preview-thumb" />
-                        <span>Change proof</span>
-                      </button>
-                    ) : (
-                      <button
-                        className="proof-attach-btn"
-                        onClick={() => fileInputRef.current?.click()}
-                      >
-                        📎 Attach payment proof (optional)
-                      </button>
-                    )}
                     <button
                       className={`btn-claim${popping ? " pop" : ""}`}
                       onClick={handleClaim}
