@@ -81,7 +81,36 @@ export async function POST(
   }
 
   if (!itemIds.length) {
-    return NextResponse.json({ error: "No items selected" }, { status: 400 });
+    const { data: currentItems } = await supabaseAdmin
+      .from("bill_items")
+      .select("id, name, amount, claimed_by")
+      .eq("bill_id", member.bill_id)
+      .order("created_at");
+
+    const allTaken = currentItems?.every((i) => i.claimed_by && i.claimed_by !== id);
+    if (!allTaken) {
+      return NextResponse.json({ error: "No items selected" }, { status: 400 });
+    }
+
+    const scPerPerson = calcScPerPerson(bill.service_charge_amount ?? 0, memberCount ?? 0);
+    const shareAmount = Math.round(scPerPerson * 100) / 100;
+
+    const updatePayload: Record<string, unknown> = {
+      claimed_paid: true,
+      share_amount: shareAmount,
+    };
+    if (proof_url) updatePayload.proof_url = proof_url;
+
+    const { error: updateError } = await supabaseAdmin
+      .from("members")
+      .update(updatePayload)
+      .eq("id", id);
+
+    if (updateError) {
+      return NextResponse.json({ error: updateError.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ ok: true, proof_url });
   }
 
   const { data: claimedItems, error: claimError } = await supabaseAdmin
