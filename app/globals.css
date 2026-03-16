@@ -1954,7 +1954,7 @@ body {
   border-radius: var(--radius);
   background: var(--surface);
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: 16px;
   color: var(--ink);
   outline: none;
   min-width: 0;
@@ -1969,13 +1969,13 @@ body {
 }
 
 .item-entry-amount-wrap {
-  width: 110px;
+  width: 120px;
   flex-shrink: 0;
 }
 
 .item-entry-amount.field-input {
   padding: 10px 10px 10px 28px;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .item-entry-remove {
