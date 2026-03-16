@@ -34,6 +34,7 @@ export default function CollectionBillCard({
   onClaimed,
 }: CollectionBillCardProps) {
   const [claiming, setClaiming] = useState(false);
+  const [confirmPending, setConfirmPending] = useState(false);
   const [claimed, setClaimed] = useState(member.claimed_paid);
   const [proofUrl, setProofUrl] = useState<string | null>(null);
   const [receiptOpen, setReceiptOpen] = useState(false);
@@ -362,14 +363,27 @@ export default function CollectionBillCard({
                       fileInputRef={fileInputRef}
                       onSelect={handleProofSelect}
                     />
-                    <button
-                      className={`btn-claim${popping ? " pop" : ""}`}
-                      onClick={handleClaim}
-                      disabled={claiming}
-                      style={{ marginTop: 10 }}
-                    >
-                      {claiming ? "Sending..." : "Bayad na ako!"}
-                    </button>
+                    {confirmPending ? (
+                      <div className="claim-confirm">
+                        <span className="claim-confirm-label">Sure ka?</span>
+                        <div className="claim-confirm-actions">
+                          <button className="claim-confirm-yes" onClick={handleClaim} disabled={claiming}>
+                            {claiming ? "Sending..." : "Yes!"}
+                          </button>
+                          <button className="claim-confirm-cancel" onClick={() => setConfirmPending(false)}>
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        className={`btn-claim${popping ? " pop" : ""}`}
+                        onClick={() => setConfirmPending(true)}
+                        style={{ marginTop: 10 }}
+                      >
+                        Bayad na ako!
+                      </button>
+                    )}
                   </div>
                 </>
               )}

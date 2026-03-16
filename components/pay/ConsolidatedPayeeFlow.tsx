@@ -46,6 +46,7 @@ export default function ConsolidatedPayeeFlow({
     needsItemPhase ? "items" : "payment"
   );
   const [claiming, setClaiming] = useState(false);
+  const [confirmPending, setConfirmPending] = useState(false);
   const [popping, setPopping] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [receiptModal, setReceiptModal] = useState<string | null>(null);
@@ -360,14 +361,27 @@ export default function ConsolidatedPayeeFlow({
               fileInputRef={fileInputRef}
               onSelect={handleProofSelect}
             />
-            <button
-              className={`btn-claim${popping ? " pop" : ""}`}
-              onClick={handleClaim}
-              disabled={claiming}
-              style={{ marginTop: 10 }}
-            >
-              {claiming ? "Sending..." : "Bayad na ako!"}
-            </button>
+            {confirmPending ? (
+              <div className="claim-confirm">
+                <span className="claim-confirm-label">Sure ka?</span>
+                <div className="claim-confirm-actions">
+                  <button className="claim-confirm-yes" onClick={handleClaim} disabled={claiming}>
+                    {claiming ? "Sending..." : "Yes!"}
+                  </button>
+                  <button className="claim-confirm-cancel" onClick={() => setConfirmPending(false)}>
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                className={`btn-claim${popping ? " pop" : ""}`}
+                onClick={() => setConfirmPending(true)}
+                style={{ marginTop: 10 }}
+              >
+                Bayad na ako!
+              </button>
+            )}
           </div>
         </>
       )}
