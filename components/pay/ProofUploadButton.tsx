@@ -28,7 +28,7 @@ export default function ProofUploadButton({ proofPreview, fileInputRef, onSelect
           className="proof-attach-btn"
           onClick={() => fileInputRef.current?.click()}
         >
-          📎 Attach payment proof (optional)
+          📎 Attach payment proof
         </button>
       )}
     </>

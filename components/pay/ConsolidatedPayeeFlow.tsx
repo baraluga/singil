@@ -374,13 +374,17 @@ export default function ConsolidatedPayeeFlow({
                 </div>
               </div>
             ) : (
-              <button
-                className={`btn-claim${popping ? " pop" : ""}`}
-                onClick={() => setConfirmPending(true)}
-                style={{ marginTop: 10 }}
-              >
-                Bayad na ako!
-              </button>
+              <>
+                <button
+                  className={`btn-claim${popping ? " pop" : ""}`}
+                  onClick={() => setConfirmPending(true)}
+                  disabled={!proofFile}
+                  style={{ marginTop: 10 }}
+                >
+                  Bayad na ako!
+                </button>
+                {!proofFile && <p className="proof-required-hint">Attach proof to continue</p>}
+              </>
             )}
           </div>
         </>
