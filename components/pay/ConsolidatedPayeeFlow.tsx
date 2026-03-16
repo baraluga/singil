@@ -281,7 +281,6 @@ export default function ConsolidatedPayeeFlow({
                   </div>
                 ) : (
                   <div className="share-card">
-                    <p className="share-card-label">Your share</p>
                     <p className="share-amount">{formatCurrency(member.share_amount)}</p>
                     {scPerPerson > 0 && (
                       <p className="share-breakdown">

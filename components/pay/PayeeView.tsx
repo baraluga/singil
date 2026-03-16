@@ -202,7 +202,7 @@ export default function PayeeView({ bill, members, paymentMethods, billItems: in
         <div className="pay-inner">
           {!hasClaimed && (
             <button className="pay-back-btn" onClick={() => setSelectedMemberId(null)}>
-              ← Oops, wrong person!
+              ← Not {selectedMember.name}?
             </button>
           )}
 
@@ -366,7 +366,6 @@ export default function PayeeView({ bill, members, paymentMethods, billItems: in
           ) : (
             <>
               <div className="share-card">
-                <p className="share-card-label">Your share</p>
                 <p className="share-amount">{formatCurrency(
                   isHonesty ? honestyTotal : isItemized ? itemizedTotal : selectedMember.share_amount
                 )}</p>
