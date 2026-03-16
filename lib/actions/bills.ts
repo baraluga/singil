@@ -49,7 +49,7 @@ export async function createBill(data: CreateBillInput): Promise<{ id: string } 
     .insert({
       user_id: CREATOR_ID,
       name: data.name,
-      date: new Date().toISOString().split("T")[0],
+      date: new Date().toLocaleDateString("en-CA"),
       total_amount: data.totalAmount,
       service_charge_amount: data.serviceChargeAmount,
       split_mode: data.splitMode,

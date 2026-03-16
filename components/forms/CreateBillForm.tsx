@@ -92,7 +92,9 @@ export default function CreateBillForm() {
     setBillItems((prev) => [...prev, newItem()]);
   }
 
-  const totalAssigned = members.reduce((sum, m) => sum + m.amount, 0);
+  const totalAssigned = splitMode === "equal"
+    ? members.reduce((sum, m) => sum + m.amount, 0)
+    : 0;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -189,14 +191,11 @@ export default function CreateBillForm() {
         </>
       )}
 
-      {splitMode === "itemized" ? (
-        <div className="field-group">
-          <label className="field-label">Total Bill Amount</label>
+      <div className="field-group">
+        <label className="field-label">Total Bill Amount</label>
+        {splitMode === "itemized" ? (
           <div className="itemized-total-display">{formatCurrency(totalAmount)}</div>
-        </div>
-      ) : (
-        <div className="field-group">
-          <label className="field-label">Total Bill Amount</label>
+        ) : (
           <div className="field-input-prefix">
             <span className="prefix">₱</span>
             <input
@@ -209,8 +208,8 @@ export default function CreateBillForm() {
               className="field-input"
             />
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       <div className="field-group">
         <label className="field-label">Service Charge</label>
