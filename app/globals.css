@@ -1258,8 +1258,8 @@ body {
   transform: scale(0.95);
 }
 
-/* ── HONESTY MODE ── */
-.honesty-receipt-btn {
+/* ── RECEIPT THUMBNAIL ── */
+.receipt-thumbnail-btn {
   display: block;
   width: 100%;
   position: relative;
@@ -1271,14 +1271,14 @@ body {
   margin-bottom: 12px;
   background: var(--border);
 }
-.honesty-receipt-img {
+.receipt-thumbnail-img {
   display: block;
   width: 100%;
   max-height: 220px;
   object-fit: cover;
   border-radius: var(--radius);
 }
-.honesty-receipt-overlay {
+.receipt-thumbnail-overlay {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -1332,23 +1332,24 @@ body {
   border-color: var(--accent);
   color: var(--accent);
 }
-.honesty-summary {
+/* ── AMOUNT SUMMARY ── */
+.amount-summary {
   border-top: 1px solid var(--border);
   padding-top: 10px;
   display: flex;
   flex-direction: column;
   gap: 5px;
 }
-.honesty-summary-row {
+.amount-summary-row {
   display: flex;
   justify-content: space-between;
   font-size: 13px;
   color: var(--ink-muted);
 }
-.honesty-summary-row.sc {
+.amount-summary-row.sc {
   color: var(--accent);
 }
-.honesty-summary-row.total {
+.amount-summary-row.total {
   font-size: 15px;
   font-weight: 700;
   color: var(--ink);
