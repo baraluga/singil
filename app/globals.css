@@ -1929,3 +1929,184 @@ body {
 .btn-claim.pop {
   animation: claim-pop 0.35s ease;
 }
+
+/* ── ITEMIZED MODE: Bill Creation ── */
+
+.item-entry-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.item-entry-num {
+  font-size: 12px;
+  color: var(--ink-muted);
+  width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.item-entry-name {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.item-entry-amount-wrap {
+  width: 110px;
+  flex-shrink: 0;
+}
+
+.item-entry-amount {
+  width: 100%;
+}
+
+.item-entry-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ink-muted);
+  font-size: 13px;
+  padding: 4px 6px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.item-entry-remove:hover {
+  color: #DC2626;
+}
+
+.itemized-total-display {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+  padding: 10px 0;
+}
+
+/* ── ITEMIZED MODE: Payee Shopping ── */
+
+.itemized-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.itemized-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-sans);
+  transition: border-color 0.15s, background 0.15s;
+  width: 100%;
+}
+
+.itemized-item:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.itemized-item.selected {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+
+.itemized-item.claimed {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.itemized-check {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.itemized-item.selected .itemized-check {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.itemized-item-name {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.itemized-item-amount {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  flex-shrink: 0;
+}
+
+.itemized-item-claimed-by {
+  font-size: 11px;
+  color: var(--ink-muted);
+  flex-shrink: 0;
+}
+
+/* ── ITEMIZED MODE: Organizer Detail ── */
+
+.bill-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 20px;
+}
+
+.bill-item-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.bill-item-name {
+  flex: 1;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.bill-item-amount {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.bill-item-status {
+  font-size: 11px;
+  color: var(--ink-muted);
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--border);
+}
+
+.bill-item-status.claimed {
+  background: var(--green-light);
+  color: var(--green);
+}
