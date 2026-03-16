@@ -1738,43 +1738,6 @@ body {
   color: var(--ink-muted);
 }
 
-/* ── COLLECTION PAYEE SUMMARY ── */
-.collection-summary {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 14px 16px;
-  margin-bottom: 16px;
-  box-shadow: var(--shadow-sm);
-}
-.collection-summary-text {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 8px;
-  gap: 8px;
-}
-.collection-summary-name {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--ink);
-}
-.collection-summary-stat {
-  font-size: 12px;
-  color: var(--ink-muted);
-}
-.collection-summary-bar {
-  height: 6px;
-  background: var(--border);
-  border-radius: 3px;
-  overflow: hidden;
-}
-.collection-summary-fill {
-  height: 100%;
-  background: var(--green);
-  border-radius: 3px;
-  transition: width 0.3s ease;
-}
 .collection-bills-list {
   margin-bottom: 16px;
 }
