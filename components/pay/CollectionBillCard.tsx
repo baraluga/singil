@@ -202,7 +202,7 @@ export default function CollectionBillCard({
                       <button
                         type="button"
                         className="btn-primary"
-                        disabled={selectedItemIds.size === 0}
+                        disabled={selectedItemIds.size === 0 && currentBillItems.some((i) => !i.claimed_by || i.claimed_by === member.id)}
                         onClick={() => setItemizedConfirmed(true)}
                         style={{ marginTop: 16 }}
                       >

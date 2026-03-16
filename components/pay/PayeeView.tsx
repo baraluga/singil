@@ -243,7 +243,7 @@ export default function PayeeView({ bill, members, paymentMethods, billItems: in
                   <button
                     type="button"
                     className="btn-primary"
-                    disabled={selectedItemIds.size === 0}
+                    disabled={selectedItemIds.size === 0 && currentBillItems.some((i) => !i.claimed_by || i.claimed_by === selectedMember.id)}
                     onClick={() => setItemizedConfirmed(true)}
                     style={{ marginTop: 16 }}
                   >
