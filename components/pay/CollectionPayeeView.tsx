@@ -102,12 +102,6 @@ export default function CollectionPayeeView({
     return m.is_paid || m.claimed_paid || claimedIds.has(m.id);
   });
 
-  const paidCount = doneBills.length;
-  const remainingAmount = unpaidBills.reduce((sum, b) => {
-    const m = findMemberByName(selectedName, b)!;
-    return sum + m.share_amount;
-  }, 0);
-
   return (
     <main className="pay-page">
       <div className="pay-header">
@@ -121,25 +115,6 @@ export default function CollectionPayeeView({
         >
           ← Not {selectedName}?
         </button>
-
-        {/* Summary bar */}
-        {myBills.length > 0 && (
-          <div className="collection-summary">
-            <div className="collection-summary-text">
-              <span className="collection-summary-name">Hi {selectedName}!</span>
-              <span className="collection-summary-stat">
-                {paidCount} of {myBills.length} paid
-                {remainingAmount > 0 && ` · ${formatCurrency(remainingAmount)} left`}
-              </span>
-            </div>
-            <div className="collection-summary-bar">
-              <div
-                className="collection-summary-fill"
-                style={{ width: `${myBills.length > 0 ? (paidCount / myBills.length) * 100 : 0}%` }}
-              />
-            </div>
-          </div>
-        )}
 
         {myBills.length === 0 ? (
           <div className="empty-state">
