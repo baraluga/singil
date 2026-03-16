@@ -41,6 +41,7 @@ interface CreateBillInput {
   receiptUrl: string | null;
   splitMode: SplitMode;
   members: Pick<MemberInput, "name" | "amount">[];
+  items?: { name: string; amount: number }[];
 }
 
 export async function createBill(data: CreateBillInput): Promise<{ id: string } | { error: string }> {
@@ -69,6 +70,17 @@ export async function createBill(data: CreateBillInput): Promise<{ id: string } 
   );
 
   if (membersError) return { error: membersError.message };
+
+  if (data.splitMode === "itemized" && data.items?.length) {
+    const { error: itemsError } = await supabaseAdmin.from("bill_items").insert(
+      data.items.map((item) => ({
+        bill_id: bill.id,
+        name: item.name,
+        amount: item.amount,
+      }))
+    );
+    if (itemsError) return { error: itemsError.message };
+  }
 
   return { id: bill.id };
 }
