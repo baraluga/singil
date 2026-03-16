@@ -128,9 +128,8 @@ export async function POST(
 
     const isHonesty = bill.split_mode === "honesty";
     const isItemized = bill.split_mode === "itemized";
-    const payload: Record<string, unknown> = proof_url
-      ? { is_paid: true, proof_url }
-      : { claimed_paid: true };
+    const payload: Record<string, unknown> = { claimed_paid: true };
+    if (proof_url) payload.proof_url = proof_url;
 
     if (isItemized) {
       const itemIds = claim.itemIds ?? [];

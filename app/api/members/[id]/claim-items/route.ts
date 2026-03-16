@@ -120,9 +120,11 @@ export async function POST(
   const scPerPerson = calcScPerPerson(bill.service_charge_amount ?? 0, memberCount ?? 0);
   const shareAmount = Math.round((foodAmount + scPerPerson) * 100) / 100;
 
-  const updatePayload: Record<string, unknown> = proof_url
-    ? { is_paid: true, proof_url, share_amount: shareAmount }
-    : { claimed_paid: true, share_amount: shareAmount };
+  const updatePayload: Record<string, unknown> = {
+    claimed_paid: true,
+    share_amount: shareAmount,
+  };
+  if (proof_url) updatePayload.proof_url = proof_url;
 
   const { error: updateError } = await supabaseAdmin
     .from("members")
