@@ -10,6 +10,7 @@ export async function confirmPaid(memberId: string, billId: string) {
     .update({ is_paid: true, claimed_paid: false })
     .eq("id", memberId);
   revalidatePath(`/bills/${billId}`);
+  revalidatePath("/bills");
 }
 
 export async function dismissClaim(memberId: string, billId: string) {
@@ -18,6 +19,7 @@ export async function dismissClaim(memberId: string, billId: string) {
     .update({ claimed_paid: false })
     .eq("id", memberId);
   revalidatePath(`/bills/${billId}`);
+  revalidatePath("/bills");
 }
 
 export async function markPaid(memberId: string, billId: string) {
@@ -26,6 +28,7 @@ export async function markPaid(memberId: string, billId: string) {
     .update({ is_paid: true })
     .eq("id", memberId);
   revalidatePath(`/bills/${billId}`);
+  revalidatePath("/bills");
 }
 
 export async function updateMemberName(memberId: string, name: string, billId: string) {

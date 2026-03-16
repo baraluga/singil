@@ -1552,6 +1552,69 @@ body {
   color: var(--accent);
 }
 
+/* ── PENDING CLAIMS ── */
+.pending-claims {
+  margin-bottom: 20px;
+}
+.pending-claims-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #92400E;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.pending-claims-count {
+  background: #FEF3C7;
+  color: #92400E;
+  border-radius: 10px;
+  padding: 1px 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.pending-claim-row {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid #F59E0B;
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pending-claim-info {
+  flex: 1;
+  min-width: 0;
+}
+.pending-claim-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.pending-claim-sub {
+  font-size: 12px;
+  color: var(--ink-muted);
+  margin-top: 1px;
+}
+.pending-claim-proof {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  object-fit: cover;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.pending-claim-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
 /* ── COLLECTION CARD ── */
 .collection-card {
   display: block;
