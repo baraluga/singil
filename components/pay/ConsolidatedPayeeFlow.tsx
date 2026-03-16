@@ -155,6 +155,9 @@ export default function ConsolidatedPayeeFlow({
                 <div className="consolidated-bill-header">
                   <span className="consolidated-bill-name">{bill.name}</span>
                   <span className="consolidated-bill-date">{date}</span>
+                  {isHonesty && foodAmount === 0 && (
+                    <span className="bill-needs-items">needs items</span>
+                  )}
                 </div>
 
                 {bill.receipt_url && (
