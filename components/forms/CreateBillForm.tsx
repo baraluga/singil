@@ -23,7 +23,6 @@ function newItem(): BillItemInput {
 export default function CreateBillForm() {
   const router = useRouter();
   const [name, setName] = useState("");
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [serviceChargeAmount, setServiceChargeAmount] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0);
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
@@ -93,7 +92,9 @@ export default function CreateBillForm() {
     setBillItems((prev) => [...prev, newItem()]);
   }
 
-  const totalAssigned = members.reduce((sum, m) => sum + m.amount, 0);
+  const totalAssigned = splitMode === "equal"
+    ? members.reduce((sum, m) => sum + m.amount, 0)
+    : 0;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -130,7 +131,6 @@ export default function CreateBillForm() {
 
     const result = await createBill({
       name: name.trim(),
-      date,
       serviceChargeAmount,
       totalAmount,
       receiptUrl,
@@ -161,56 +161,6 @@ export default function CreateBillForm() {
         />
       </div>
 
-      <div className="row-2" style={{ marginBottom: 16 }}>
-        <div className="field-group" style={{ marginBottom: 0 }}>
-          <label className="field-label">Date</label>
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="field-input"
-          />
-        </div>
-        <div className="field-group" style={{ marginBottom: 0 }}>
-          <label className="field-label">Service Charge</label>
-          <div className="field-input-prefix">
-            <span className="prefix">₱</span>
-            <input
-              type="number"
-              min="0"
-              step="0.01"
-              value={serviceChargeAmount || ""}
-              onChange={(e) => setServiceChargeAmount(parseFloat(e.target.value) || 0)}
-              placeholder="0.00"
-              className="field-input"
-            />
-          </div>
-        </div>
-      </div>
-
-      {splitMode === "itemized" ? (
-        <div className="field-group">
-          <label className="field-label">Total Bill Amount</label>
-          <div className="itemized-total-display">{formatCurrency(totalAmount)}</div>
-        </div>
-      ) : (
-        <div className="field-group">
-          <label className="field-label">Total Bill Amount</label>
-          <div className="field-input-prefix">
-            <span className="prefix">₱</span>
-            <input
-              type="number"
-              min="0"
-              step="0.01"
-              value={totalAmount || ""}
-              onChange={(e) => setTotalAmount(parseFloat(e.target.value) || 0)}
-              placeholder="0.00"
-              className="field-input"
-            />
-          </div>
-        </div>
-      )}
-
       <div className="field-group">
         <label className="field-label">Receipt Photo</label>
         <ReceiptUpload preview={receiptPreview} onChange={handleReceiptChange} />
@@ -240,6 +190,42 @@ export default function CreateBillForm() {
           </button>
         </>
       )}
+
+      <div className="field-group">
+        <label className="field-label">Total Bill Amount</label>
+        {splitMode === "itemized" ? (
+          <div className="itemized-total-display">{formatCurrency(totalAmount)}</div>
+        ) : (
+          <div className="field-input-prefix">
+            <span className="prefix">₱</span>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={totalAmount || ""}
+              onChange={(e) => setTotalAmount(parseFloat(e.target.value) || 0)}
+              placeholder="0.00"
+              className="field-input"
+            />
+          </div>
+        )}
+      </div>
+
+      <div className="field-group">
+        <label className="field-label">Service Charge</label>
+        <div className="field-input-prefix">
+          <span className="prefix">₱</span>
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            value={serviceChargeAmount || ""}
+            onChange={(e) => setServiceChargeAmount(parseFloat(e.target.value) || 0)}
+            placeholder="0.00"
+            className="field-input"
+          />
+        </div>
+      </div>
 
       <div className="field-label" style={{ marginBottom: 8 }}>Members</div>
       <div className="members-list">
