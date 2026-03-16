@@ -1740,42 +1740,6 @@ body {
 }
 
 /* ── CONSOLIDATED PAYEE FLOW ── */
-.consolidated-receipt-gallery {
-  display: flex;
-  gap: 10px;
-  overflow-x: auto;
-  padding-bottom: 4px;
-  margin-bottom: 20px;
-  -webkit-overflow-scrolling: touch;
-}
-.consolidated-receipt-thumb {
-  flex-shrink: 0;
-  width: 100px;
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-}
-.consolidated-receipt-thumb img {
-  width: 100%;
-  height: 80px;
-  object-fit: cover;
-  display: block;
-}
-.consolidated-receipt-label {
-  font-size: 10px;
-  color: var(--ink-muted);
-  padding: 4px 6px;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: block;
-}
 .consolidated-bill-section {
   margin-bottom: 20px;
 }

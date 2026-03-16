@@ -120,11 +120,6 @@ export default function ConsolidatedPayeeFlow({
     }
   }
 
-  // ── Receipts to show in gallery ──────────────────────────────────────────────
-  const receipts = unpaidBills
-    .filter((b) => b.receipt_url)
-    .map((b) => ({ billName: b.name, url: b.receipt_url! }));
-
   // ── Render ───────────────────────────────────────────────────────────────────
 
   if (unpaidBills.length === 0) {
@@ -137,24 +132,6 @@ export default function ConsolidatedPayeeFlow({
 
   return (
     <>
-      {/* Receipt gallery */}
-      {receipts.length > 0 && (
-        <div className="consolidated-receipt-gallery">
-          {receipts.map(({ billName, url }) => (
-            <button
-              key={url}
-              className="consolidated-receipt-thumb"
-              onClick={() => setReceiptModal(url)}
-              aria-label={`View receipt for ${billName}`}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={url} alt={`Receipt for ${billName}`} />
-              <span className="consolidated-receipt-label">{billName}</span>
-            </button>
-          ))}
-        </div>
-      )}
-
       {phase === "items" ? (
         /* ── Phase 1: Item entry ─────────────────────────────────────── */
         <>
@@ -176,6 +153,27 @@ export default function ConsolidatedPayeeFlow({
                   <span className="consolidated-bill-name">{bill.name}</span>
                   <span className="consolidated-bill-date">{date}</span>
                 </div>
+
+                {bill.receipt_url && (
+                  isHonesty ? (
+                    <button
+                      className="honesty-receipt-btn"
+                      onClick={() => setReceiptModal(bill.receipt_url!)}
+                      aria-label="View receipt"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={bill.receipt_url} alt="Receipt" className="honesty-receipt-img" />
+                      <span className="honesty-receipt-overlay">🔍 Tap to expand</span>
+                    </button>
+                  ) : (
+                    <button
+                      className="receipt-link-btn"
+                      onClick={() => setReceiptModal(bill.receipt_url!)}
+                    >
+                      🧾 View receipt
+                    </button>
+                  )
+                )}
 
                 {isHonesty ? (
                   <div className="share-card">
