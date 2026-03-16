@@ -1171,7 +1171,7 @@ body {
 /* ── NAME PICKER ── */
 .name-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 10px;
   margin-bottom: 16px;
 }
@@ -1740,42 +1740,6 @@ body {
 }
 
 /* ── CONSOLIDATED PAYEE FLOW ── */
-.consolidated-receipt-gallery {
-  display: flex;
-  gap: 10px;
-  overflow-x: auto;
-  padding-bottom: 4px;
-  margin-bottom: 20px;
-  -webkit-overflow-scrolling: touch;
-}
-.consolidated-receipt-thumb {
-  flex-shrink: 0;
-  width: 100px;
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-}
-.consolidated-receipt-thumb img {
-  width: 100%;
-  height: 80px;
-  object-fit: cover;
-  display: block;
-}
-.consolidated-receipt-label {
-  font-size: 10px;
-  color: var(--ink-muted);
-  padding: 4px 6px;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: block;
-}
 .consolidated-bill-section {
   margin-bottom: 20px;
 }
@@ -1793,6 +1757,15 @@ body {
 .consolidated-bill-date {
   font-size: 12px;
   color: var(--ink-muted);
+}
+.bill-needs-items {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-light);
+  border-radius: 4px;
+  padding: 2px 6px;
 }
 .consolidated-grand-total {
   display: flex;

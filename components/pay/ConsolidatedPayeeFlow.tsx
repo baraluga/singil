@@ -42,7 +42,10 @@ export default function ConsolidatedPayeeFlow({
     if (bill.split_mode === "honesty") initialItems[bill.id] = [0];
   }
   const [billItems, setBillItems] = useState<Record<string, number[]>>(initialItems);
-  const [phase, setPhase] = useState<"items" | "payment">("items");
+  const hasHonestyBills = unpaidBills.some((b) => b.split_mode === "honesty");
+  const [phase, setPhase] = useState<"items" | "payment">(
+    hasHonestyBills ? "items" : "payment"
+  );
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [proofPreview, setProofPreview] = useState<string | null>(null);
   const [claiming, setClaiming] = useState(false);
@@ -120,11 +123,6 @@ export default function ConsolidatedPayeeFlow({
     }
   }
 
-  // ── Receipts to show in gallery ──────────────────────────────────────────────
-  const receipts = unpaidBills
-    .filter((b) => b.receipt_url)
-    .map((b) => ({ billName: b.name, url: b.receipt_url! }));
-
   // ── Render ───────────────────────────────────────────────────────────────────
 
   if (unpaidBills.length === 0) {
@@ -137,24 +135,6 @@ export default function ConsolidatedPayeeFlow({
 
   return (
     <>
-      {/* Receipt gallery */}
-      {receipts.length > 0 && (
-        <div className="consolidated-receipt-gallery">
-          {receipts.map(({ billName, url }) => (
-            <button
-              key={url}
-              className="consolidated-receipt-thumb"
-              onClick={() => setReceiptModal(url)}
-              aria-label={`View receipt for ${billName}`}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={url} alt={`Receipt for ${billName}`} />
-              <span className="consolidated-receipt-label">{billName}</span>
-            </button>
-          ))}
-        </div>
-      )}
-
       {phase === "items" ? (
         /* ── Phase 1: Item entry ─────────────────────────────────────── */
         <>
@@ -175,7 +155,31 @@ export default function ConsolidatedPayeeFlow({
                 <div className="consolidated-bill-header">
                   <span className="consolidated-bill-name">{bill.name}</span>
                   <span className="consolidated-bill-date">{date}</span>
+                  {isHonesty && foodAmount === 0 && (
+                    <span className="bill-needs-items">needs items</span>
+                  )}
                 </div>
+
+                {bill.receipt_url && (
+                  isHonesty ? (
+                    <button
+                      className="honesty-receipt-btn"
+                      onClick={() => setReceiptModal(bill.receipt_url!)}
+                      aria-label="View receipt"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={bill.receipt_url} alt="Receipt" className="honesty-receipt-img" />
+                      <span className="honesty-receipt-overlay">🔍 Tap to expand</span>
+                    </button>
+                  ) : (
+                    <button
+                      className="receipt-link-btn"
+                      onClick={() => setReceiptModal(bill.receipt_url!)}
+                    >
+                      🧾 View receipt
+                    </button>
+                  )
+                )}
 
                 {isHonesty ? (
                   <div className="share-card">
@@ -234,7 +238,7 @@ export default function ConsolidatedPayeeFlow({
                         </div>
                         {scPerPerson > 0 && (
                           <div className="honesty-summary-row sc">
-                            <span>SC (your share)</span>
+                            <span>SC (split equally)</span>
                             <span>+{formatCurrency(scPerPerson)}</span>
                           </div>
                         )}
@@ -279,13 +283,15 @@ export default function ConsolidatedPayeeFlow({
       ) : (
         /* ── Phase 2: Payment ────────────────────────────────────────── */
         <>
-          <button
-            className="pay-back-btn"
-            style={{ marginBottom: 12 }}
-            onClick={() => setPhase("items")}
-          >
-            ← Edit items
-          </button>
+          {hasHonestyBills && (
+            <button
+              className="pay-back-btn"
+              style={{ marginBottom: 12 }}
+              onClick={() => setPhase("items")}
+            >
+              ← Edit items
+            </button>
+          )}
 
           {/* Per-bill summary */}
           <div className="share-card">

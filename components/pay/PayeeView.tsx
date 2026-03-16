@@ -262,7 +262,7 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
                       </div>
                       {scPerPerson > 0 && (
                         <div className="honesty-summary-row sc">
-                          <span>SC (your share)</span>
+                          <span>SC (split equally)</span>
                           <span>+{formatCurrency(scPerPerson)}</span>
                         </div>
                       )}
@@ -301,7 +301,7 @@ export default function PayeeView({ bill, members, paymentMethods }: PayeeViewPr
                     </div>
                     {scPerPerson > 0 && (
                       <div className="honesty-summary-row sc">
-                        <span>SC (your share)</span>
+                        <span>SC (split equally)</span>
                         <span>+{formatCurrency(scPerPerson)}</span>
                       </div>
                     )}
