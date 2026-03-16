@@ -92,8 +92,9 @@ export async function POST(
     ? Math.round((honestyFoodAmount + scPerPerson) * 100) / 100
     : null;
 
-  const updatePayload: Record<string, unknown> = { claimed_paid: true };
-  if (proof_url) updatePayload.proof_url = proof_url;
+  const updatePayload: Record<string, unknown> = proof_url
+    ? { is_paid: true, proof_url }
+    : { claimed_paid: true };
   if (computedShareAmount != null) updatePayload.share_amount = computedShareAmount;
 
   const { error: updateError } = await supabaseAdmin
