@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { BillWithMembers, CollectionWithBills } from "@/lib/types";
 import BillCard from "@/components/bills/BillCard";
+import PendingClaims from "@/components/bills/PendingClaims";
 import CollectionCard from "@/components/collections/CollectionCard";
 
 interface BillsTabsProps {
@@ -42,6 +43,7 @@ export default function BillsTabs({ activeBills, settledBills, collections }: Bi
 
       {tab === "active" && (
         <>
+          <PendingClaims activeBills={activeBills} />
           {activeBills.length === 0 ? (
             <div className="empty-state">
               <div className="empty-state-icon">🧾</div>
