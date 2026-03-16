@@ -8,6 +8,7 @@ const MAX_SIZE = 2 * 1024 * 1024; // 2MB
 interface ClaimEntry {
   memberId: string;
   amount?: number; // food amount, required for honesty-mode members
+  itemIds?: string[]; // item IDs, required for itemized-mode members
 }
 
 interface MemberRow {
@@ -126,10 +127,49 @@ export async function POST(
     if (!bill) continue;
 
     const isHonesty = bill.split_mode === "honesty";
+    const isItemized = bill.split_mode === "itemized";
     const payload: Record<string, unknown> = { claimed_paid: true };
     if (proof_url) payload.proof_url = proof_url;
 
-    if (isHonesty) {
+    if (isItemized) {
+      const itemIds = claim.itemIds ?? [];
+      if (itemIds.length === 0) {
+        return NextResponse.json(
+          { error: `No items selected for member ${claim.memberId}` },
+          { status: 400 }
+        );
+      }
+
+      const { data: claimedItems, error: claimErr } = await supabaseAdmin
+        .from("bill_items")
+        .update({ claimed_by: claim.memberId })
+        .eq("bill_id", member.bill_id)
+        .in("id", itemIds)
+        .is("claimed_by", null)
+        .select("id, amount");
+
+      if (claimErr) {
+        return NextResponse.json({ error: claimErr.message }, { status: 500 });
+      }
+
+      if (!claimedItems || claimedItems.length < itemIds.length) {
+        if (claimedItems?.length) {
+          await supabaseAdmin
+            .from("bill_items")
+            .update({ claimed_by: null })
+            .in("id", claimedItems.map((i) => i.id));
+        }
+        return NextResponse.json(
+          { error: "Some items were already claimed" },
+          { status: 409 }
+        );
+      }
+
+      const foodAmount = claimedItems.reduce((sum, item) => sum + Number(item.amount), 0);
+      const memberCount = memberCountMap.get(member.bill_id) ?? 0;
+      const scPerPerson = calcScPerPerson(bill.service_charge_amount, memberCount);
+      payload.share_amount = Math.round((foodAmount + scPerPerson) * 100) / 100;
+    } else if (isHonesty) {
       const foodAmount = claim.amount ?? 0;
       if (foodAmount <= 0) {
         return NextResponse.json(
